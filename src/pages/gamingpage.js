@@ -53,8 +53,8 @@ function GamingPage() {
     const msg = JSON.parse(event.data);
     switch (msg.type) {
       case "carPosition":
-        updateCarPosition(msg.value);
-        updateCarPositionOmar(msg.value);
+        // updateCarPosition(msg.value);
+        // updateCarPositionOmar(msg.value);
         break;
       case "gameStop":
         setGameStop(msg.value);
