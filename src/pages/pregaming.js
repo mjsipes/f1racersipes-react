@@ -13,7 +13,7 @@ function Pregaming() {
   useEffect(() => {
     const getuserInfo = () => {
       setUserInfo({
-        userName: "hiwqw",
+        userName: "hello world",
         gamesPlayed: 2,
         gamesWon: 0,
         totalWordsTyped: 0,
