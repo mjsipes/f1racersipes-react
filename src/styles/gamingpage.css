@@ -1,0 +1,107 @@
+body {
+    font: 100% Lucida Sans, Verdana;
+    margin: 20px;
+    line-height: 26px;
+    background-color: #f4f4f4;
+  }
+  
+  .wrapper {
+    position: relative;
+    overflow: auto;
+    max-width: 800px;
+    margin: auto;
+    border: 2px solid #e74c3c; /* Red border */
+    border-radius: 8px; /* Rounded corners for the wrapper */
+    padding: 20px; /* Padding inside the wrapper */
+  }
+  
+  .header {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+  }
+  
+  .header h1 {
+    color: #e74c3c; /* Red color for the text */
+    margin-left: 10px; /* Spacing after the image */
+  }
+  
+  .game-stats {
+    font-size: 80%; /* Smaller font size for game statistics */
+    color: #e74c3c;
+    margin-left: 10px;
+    margin-top: 10px; /* Spacing from the title */
+  }
+  
+  .header img {
+    height: 50px;
+  }
+  
+  .racetrack-image {
+    display: block;
+    width: 100%;
+    max-width: 600px;
+    margin: 20px auto;
+    border-radius: 8px; /* Rounded corners for the image */
+  }
+  
+  .button {
+    display: block;
+    padding: 15px 25px;
+    margin: 20px auto;
+    border: 1px solid #d4d4d4;
+    background-color: #e74c3c;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    width: 200px; /* Set a fixed width for buttons */
+  }
+  
+  .button:hover {
+    background-color: #c0392b;
+  }
+  
+  .racing-window {
+    width: 700px;
+    height: 300px;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #e74c3c;
+    border-radius: 20px;
+  }
+  
+  .road {
+    width: 670px;
+    height: 270px;
+    background: #ddd;
+    border-radius: 50%;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    position: relative;
+  }
+  
+  .grass-photo {
+    width: 580px;
+    height: 200px;
+    border-radius: 50%;
+    justify-content: center;
+    align-content: center;
+    margin: auto;
+    box-shadow: 0px 0px 5px 0px black;
+  }
+  
+  .car-sprite {
+    width: 40px;
+    height: auto;
+    margin: auto;
+    position: absolute;
+    transform: translate(0px, -120px) scaleX(-1);
+  }
+  

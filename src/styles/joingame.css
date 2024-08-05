@@ -1,0 +1,96 @@
+/* joingame.css */
+
+body {
+    font-family: 'Lucida Sans', Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    /* background: url('racetrack-background.jpg') no-repeat center center fixed; */
+    background-size: cover;
+    line-height: 1.6;
+  }
+  
+  .container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .header img {
+    height: 50px;
+    margin-right: 20px;
+  }
+  
+  h2 {
+    color: #e74c3c;
+    margin: 0;
+  }
+  
+  label {
+    display: block;
+    margin: 10px 0;
+  }
+  
+  input[type="text"] {
+    width: calc(100% - 22px);
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin: 20px 0;
+    background-color: #e74c3c;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .button:hover {
+    background-color: #c0392b;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  th {
+    background-color: #e74c3c;
+    color: white;
+  }
+  
+  tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  
+  tr:hover {
+    background-color: #ddd;
+  }
+  
+  .error-message {
+    color: red;
+    margin-top: 10px;
+  }
+  
