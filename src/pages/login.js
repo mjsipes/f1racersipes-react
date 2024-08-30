@@ -4,18 +4,36 @@ import "../styles/login.css";
 function Login() {
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     const username = event.target.username.value;
     const password = event.target.password.value;
 
-    // Here, you can add your JavaScript logic for form submission
-    // For example, you could simulate a login process:
-    if (username === "user" && password === "pass") {
-      window.location.href = "/pregaming"; // Change to your next page URL
-    } else {
-      setErrorMessage("Invalid username or password");
+    try {
+      const response = await fetch("http://localhost:3001/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Invalid username or password");
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        localStorage.setItem("username", result.username);
+        window.location.href = "/pregaming"; // Redirect to the desired page
+      } else {
+        setErrorMessage(result.error || "Invalid username or password");
+      }
+    } catch (error) {
+      console.error("Error during login:", error);
+      setErrorMessage("An error occurred during login. Please try again.");
     }
   };
 
@@ -24,7 +42,7 @@ function Login() {
       <div className="container">
         <h2>Log In to F1 Racer</h2>
         <form id="loginForm" onSubmit={handleSubmit}>
-          <label htmlFor="username">Username</label>
+          <label htmlFor="username">username</label>
           <input type="text" id="username" name="username" required />
 
           <label htmlFor="password">Password</label>

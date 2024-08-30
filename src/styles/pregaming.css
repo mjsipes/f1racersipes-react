@@ -27,7 +27,7 @@ body {
   }
   
   .player-stats {
-    display: none;
+    /* display: none; */
     font-size: 80%; /* Smaller font size for game statistics */
     color: #e74c3c;
     margin-left: 10px;

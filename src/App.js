@@ -8,7 +8,7 @@ import Pregaming from "./pages/pregaming";
 import StartGame from "./pages/startgame";
 import JoinGame from "./pages/joingame";
 import GamingPage from "./pages/gamingpage";
-
+import Chat from "./pages/chat";
 function App() {
   return (
     <div className="App">
@@ -19,7 +19,8 @@ function App() {
         <Route path="/pregaming" element={<Pregaming />} />
         <Route path="/startgame" element={<StartGame />} />
         <Route path="/joingame" element={<JoinGame />} />
-        <Route path="/game" element={<GamingPage />} />
+        <Route path="/game/*" element={<GamingPage />} />
+        <Route path="/chat" element={<Chat />} />
       </Routes>
     </div>
   );

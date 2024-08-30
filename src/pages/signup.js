@@ -4,7 +4,7 @@ import "../styles/signup.css";
 function Signup() {
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     const username = event.target.username.value;
@@ -12,21 +12,39 @@ function Signup() {
     const confirmPassword = event.target.confirm_password.value;
     const termsAccepted = event.target.terms.checked;
 
-    if (!termsAccepted) {
-      setErrorMessage("You must accept the terms and conditions.");
-      return;
-    }
+    try {
+      const response = await fetch("http://localhost:3001/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          password,
+          confirmPassword,
+          termsAccepted,
+        }),
+      });
 
-    if (password !== confirmPassword) {
-      setErrorMessage("Passwords do not match.");
-      return;
-    }
+      if (!response.ok) {
+        const { error } = await response.json();
+        throw new Error(error || "Registration failed.");
+      }
 
-    // Simulate a registration process
-    if (username === "newuser") {
-      window.location.href = "/pregaming"; // Change to your next page URL
-    } else {
-      setErrorMessage("Registration failed. Username already exists.");
+      const result = await response.json();
+      if (result.success) {
+        localStorage.setItem("username", result.username);
+        window.location.href = "/pregaming"; // Redirect to the desired page
+      } else {
+        setErrorMessage(
+          result.error || "Registration failed. Please try again."
+        );
+      }
+    } catch (error) {
+      console.error("Error during registration:", error);
+      setErrorMessage(
+        error.message || "Registration failed. Please try again."
+      );
     }
   };
 
@@ -35,7 +53,7 @@ function Signup() {
       <div className="container">
         <h2>Register for F1 Racer</h2>
         <form id="registerForm" onSubmit={handleSubmit}>
-          <label htmlFor="username">Username</label>
+          <label htmlFor="username">username</label>
           <input type="text" id="username" name="username" required />
 
           <label htmlFor="password">Password</label>

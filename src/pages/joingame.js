@@ -10,14 +10,44 @@ function JoinGame() {
     fetchGames();
   }, []);
 
-  const fetchGames = () => {
-    // Replace AJAX fetch with a simple "Hello World" response
-    const helloWorldResponse = [{ serverName: "Hello World" }];
-    setGames(helloWorldResponse);
+  const fetchGames = async () => {
+    try {
+      const response = await fetch("http://localhost:3001/get-games", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch game servers.");
+      }
+      const gameServerList = await response.json();
+      setGames(gameServerList);
+    } catch (error) {
+      console.error("Error:", error);
+      setErrorMessage("An error occurred while fetching the game servers.");
+    }
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    try {
+      const username = localStorage.getItem("username");
+      const response = await fetch("http://localhost:3001/join-game", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, gameServerName }),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to join game server.");
+      }
+      window.location.href = `/game`;
+    } catch (error) {
+      console.error("Error:", error);
+      setErrorMessage("An error occurred while joining the game server.");
+    }
   };
 
   return (

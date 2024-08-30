@@ -2,10 +2,10 @@ import React, { useState, useEffect, useRef } from "react";
 import "../styles/gamingpage.css";
 
 function GamingPage() {
-  const [socket, setSocket] = useState(null);
+  //game state
   const [gameStart, setGameStart] = useState(false);
   const [gameStop, setGameStop] = useState(false);
-  const [prompt, setPrompt] = useState(""); // Initial prompt state
+  const [prompt, setPrompt] = useState("wefwefwfw"); // Initial prompt state
 
   // Player state
   const [response, setResponse] = useState("");
@@ -20,6 +20,9 @@ function GamingPage() {
   const [numCharactersTyped, setNumCharactersTyped] = useState(0);
   const [CPM, setCPM] = useState(0);
 
+  const [ws, setWs] = useState(null);
+  const username = localStorage.getItem("username");
+
   const startTimeRef = useRef(null);
   const intervalRef = useRef(null);
 
@@ -27,54 +30,82 @@ function GamingPage() {
   const typingInputRef = useRef(null);
 
   useEffect(() => {
-    const newSocket = new WebSocket(
-      "ws://localhost:3000/f1racer2/GamingPageWebSocket"
-    );
-    setSocket(newSocket);
-
-    newSocket.onopen = () => {
+    console.log("gamingpage.js: Connecting to Websocket server...");
+    const websocket = new WebSocket(`ws://localhost:3001?username=${username}`);
+    setWs(websocket);
+    websocket.onopen = () => {
       console.log("Connected to WebSocket server");
     };
-
-    newSocket.onmessage = handleSocketMessage;
-
-    newSocket.onclose = () => {
+    websocket.onmessage = handleSocketMessage;
+    websocket.onclose = () => {
       console.log("Disconnected!");
     };
 
-    // Clean up the socket connection when component unmounts
     return () => {
-      newSocket.close();
-      clearInterval(intervalRef.current);
+      websocket.close();
     };
   }, []);
 
   const handleSocketMessage = (event) => {
-    const msg = JSON.parse(event.data);
+    console.log("Received message from WebSocket server:", event.data);
+    let msg;
+    try {
+      msg = JSON.parse(event.data);
+    } catch (error) {
+      console.error("Failed to parse WebSocket message as JSON:", error);
+      return;
+    }
+    if (!msg.type) {
+      console.error("Message type is missing:", msg);
+      return;
+    }
     switch (msg.type) {
       case "carPosition":
-        // updateCarPosition(msg.value);
-        // updateCarPositionOmar(msg.value);
+        handleCarPosition(msg.value);
         break;
       case "gameStop":
-        setGameStop(msg.value);
-        updateIsWinnerOrLoser();
+        handleGameStop(msg.value);
         break;
       case "gameStart":
-        setGameStart(msg.value);
+        handleGameStart(msg.value);
         break;
       case "gameServerName":
-        document.getElementById("gameServerName").innerText = msg.value;
+        updateGameServerName(msg.value);
         break;
-      case "userName":
-        document.getElementById("userName").innerText = msg.value;
+      case "username":
+        updateusername(msg.value);
         break;
       case "prompt":
-        setPrompt(msg.value);
+        handlePrompt(msg.value);
         break;
       default:
         console.error("Unknown message type:", msg.type);
     }
+  };
+
+  const handleCarPosition = (value) => {
+    updateCarPosition(value);
+  };
+
+  const handleGameStop = (value) => {
+    setGameStop(value);
+    updateIsWinnerOrLoser();
+  };
+
+  const handleGameStart = (value) => {
+    setGameStart(value);
+  };
+
+  const updateGameServerName = (value) => {
+    document.getElementById("gameServerName").innerText = value;
+  };
+
+  const updateusername = (value) => {
+    document.getElementById("username").innerText = value;
+  };
+
+  const handlePrompt = (value) => {
+    setPrompt(value);
   };
 
   const handleTypingInput = (event) => {
@@ -120,6 +151,34 @@ function GamingPage() {
     setCPM(newCPM);
   };
 
+  function updateCarPosition(value) {
+    try {
+      const data = JSON.parse(value); // Parse the JSON data
+      if (!Array.isArray(data)) {
+        throw new Error("Invalid data format, expected an array.");
+      }
+      let table = `<table border="1"><tr><th>Player Name</th><th>Game Status</th></tr>`;
+
+      // Iterate over the data to create table rows
+      data.forEach((item) => {
+        table += `<tr><td>${item.serverName || "Unknown"}</td><td>${
+          item.gameStatus || "Unknown"
+        }</td></tr>`;
+      });
+
+      table += "</table>";
+      // Safely update the inner HTML of the element
+      const carPositionElement = document.getElementById("carPosition");
+      if (carPositionElement) {
+        carPositionElement.innerHTML = table;
+      } else {
+        console.error("Element with id 'carPosition' not found.");
+      }
+    } catch (error) {
+      console.error("Failed to update car position:", error.message);
+    }
+  }
+
   const updatePercentComplete = (newResponse) => {
     if (!isError) {
       const completion = ((newResponse.length / prompt.length) * 100).toFixed(
@@ -143,9 +202,9 @@ function GamingPage() {
   };
 
   const send = (type, value) => {
-    if (socket) {
+    if (ws) {
       const jsonMessage = JSON.stringify({ type, value });
-      socket.send(jsonMessage);
+      ws.send(jsonMessage);
       console.log("Sending:", jsonMessage);
     }
   };
@@ -155,7 +214,7 @@ function GamingPage() {
       <div className="header">
         <img src="/F1RacerLogo.png" alt="F1 Racer Logo" />
         <h1>
-          F1Racer, <span id="userName"></span>, playing in{" "}
+          F1Racer, <span id="username"></span>, playing in{" "}
           <span id="gameServerName"></span>
           <span id="endOfGameMessage"></span>
         </h1>
@@ -170,6 +229,8 @@ function GamingPage() {
         <span id="timer">{timeElapsed}</span> seconds.{" "}
         <span id="percentComplete">{percentComplete}</span>% complete.
       </h1>
+
+      <span id="carPosition"></span>
 
       <p>
         Prompt: <span id="prompt">{prompt}</span>

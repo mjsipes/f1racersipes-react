@@ -9,36 +9,54 @@ class GameServer {
     this.start = false;
     this.stop = false;
     this.players = new Set();
-    console.log(`GameServer: ${this.name} - initializing...`);
+    console.log(`gameserver.js: ${this.name} - initializing...`);
 
     this.init();
   }
 
-  init() {
-    console.log(`GameServer: ${this.name} - generating prompt`);
-    this.prompt = this.generatePrompt(
-      parseInt(this.difficulty),
-      this.customTopic
-    );
+  async init() {
+    console.log(`gameserver.js: ${this.name} - generating prompt`);
+    this.prompt = await this.generatePrompt();
     this.sendAll("prompt", this.prompt);
-    console.log(`GameServer: ${this.name} - prompt generated: ${this.prompt}`);
-    // Start game logic
     this.startGame();
   }
 
-  generatePrompt(difficulty, customTopic) {
-    // Placeholder for prompt generation logic
-    return `Generated prompt with difficulty ${difficulty} and topic ${customTopic}`;
+  async generatePrompt() {
+    const difficulty = parseInt(this.difficulty);
+    const customTopic = this.customTopic;
+
+    try {
+      const response = await fetch("http://localhost:3001/generate-prompt", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ difficulty, customTopic }),
+      });
+
+      const data = await response.json();
+      if (data.status === "success") {
+        return data.prompt;
+      } else {
+        console.error(`Error generating prompt: ${data.message}`);
+        return `Error: ${data.message}`;
+      }
+    } catch (error) {
+      console.error("Error fetching prompt:", error);
+      return "Error: Could not generate prompt.";
+    }
   }
 
   addPlayer(player) {
-    console.log(`GameServer: ${this.name} - adding player ${player.userName}`);
+    console.log(
+      `gameserver.js: ${this.name} - adding player ${player.username}`
+    );
     this.players.add(player);
   }
 
   removePlayer(player) {
     console.log(
-      `GameServer: ${this.name} - removing player ${player.userName}`
+      `gameserver.js: ${this.name} - removing player ${player.username}`
     );
     this.players.delete(player);
     if (this.players.size === 0) {
@@ -48,7 +66,7 @@ class GameServer {
   }
 
   startGame() {
-    console.log(`GameServer: ${this.name} - starting game`);
+    console.log(`gameserver.js: ${this.name} - starting game`);
     this.start = true;
     this.sendAll("gameStart", true);
 
@@ -59,16 +77,16 @@ class GameServer {
   }
 
   stopGame() {
-    console.log(`GameServer: ${this.name} - stopping game`);
+    console.log(`gameserver.js: ${this.name} - stopping game`);
     this.stop = true;
     this.sendAll("gameStop", this.stop);
-    console.log(`GameServer: ${this.name} - game server terminated`);
+    console.log(`gameserver.js: ${this.name} - game server terminated`);
   }
 
   sendPositionUpdate() {
-    console.log("GameServer: sending position update");
+    console.log("gameserver.js: sending position update");
     const statuses = Array.from(this.players).map((player) => ({
-      serverName: player.userName,
+      serverName: player.username,
       gameStatus: String(player.percentComplete),
     }));
 
@@ -77,7 +95,7 @@ class GameServer {
   }
 
   sendAll(type, value) {
-    console.log(`GameServer: sending to all - ${type} - ${value}`);
+    console.log(`gameserver.js: sending to all - ${type} - ${value}`);
     this.players.forEach((player) => {
       player.send(type, value);
     });

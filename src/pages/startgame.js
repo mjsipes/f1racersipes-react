@@ -2,37 +2,40 @@ import React, { useState } from "react";
 import "../styles/startgame.css";
 
 function StartGame() {
-  const [gameServerName, setGameServerName] = useState("");
+  const [gameServerName, setgameServerName] = useState("");
   const [difficulty, setDifficulty] = useState(1);
   const [customTopic, setCustomTopic] = useState("");
   const [message, setMessage] = useState("");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    const requestBody = {
-      gameServerName,
-      difficulty,
-      customTopic,
-    };
-
     try {
-      const response = await fetch("/create-game", {
+      const response = await fetch("http://localhost:3001/create-game", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(requestBody),
+        body: JSON.stringify({ gameServerName, difficulty, customTopic }),
       });
-
-      const result = await response.json();
-
-      if (result.status === "success") {
-        setMessage("Game server created successfully!");
-        // Optionally redirect to the game page or update the UI
-        window.location.href = `/game/${gameServerName}`;
-      } else {
-        setMessage("Failed to create game server: " + result.message);
+      if (!response.ok) {
+        throw new Error("Failed to join game server.");
+      }
+      try {
+        const username = localStorage.getItem("username");
+        const response = await fetch("http://localhost:3001/join-game", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username, gameServerName }),
+        });
+        if (!response.ok) {
+          throw new Error("Failed to join game server.");
+        }
+        window.location.href = `/game`;
+      } catch (error) {
+        console.error("Error:", error);
+        setMessage("An error occurred while joining the game server.");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -55,7 +58,7 @@ function StartGame() {
           className="topic-box"
           placeholder="Enter name for your game server"
           value={gameServerName}
-          onChange={(e) => setGameServerName(e.target.value)}
+          onChange={(e) => setgameServerName(e.target.value)}
           required
         />
 
