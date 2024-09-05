@@ -1,0 +1,130 @@
+/* Global Styles */
+body {
+    font: 100% Lucida Sans, Verdana;
+    margin: 0;
+    padding: 0;
+    /* background-color: #f4f4f4; */
+    background-color: aqua;
+    line-height: 1.6;
+  }
+  
+  /* Container Styles */
+  .container {
+    background: #fff;
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: auto;
+  }
+  
+  /* Header and Logo */
+  h2 {
+    color: #e74c3c;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .logo {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%; /* Adjust as needed */
+    margin-bottom: 20px;
+  }
+  
+  /* Button Styles */
+  .button,
+  .modal-button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: #e74c3c;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .button-group .button {
+    display: inline-block;
+    width: auto;
+    padding: 10px 20px;
+    margin: 10px;
+    border: 1px solid #d4d4d4;
+  }
+  
+  .button:hover,
+  .modal-button:hover {
+    background-color: #c0392b;
+  }
+  
+  /* Input and Label Styles */
+  label {
+    display: block;
+    margin: 10px 0 5px;
+  }
+  
+  input[type="text"],
+  input[type="password"],
+  input[type="email"] {
+    width: calc(100% - 22px);
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  /* Error Message */
+  .error-message {
+    color: red;
+    margin-top: 10px;
+    text-align: center;
+  }
+  
+  /* Checkbox */
+  .checkbox {
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+  }
+  
+  .checkbox input {
+    margin-right: 10px;
+  }
+  
+  /* Terms */
+  .terms {
+    font-size: 14px;
+  }
+  
+  /* Modal Styles */
+  .modal {
+    display: block;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+  
+  .modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 400px;
+    border-radius: 8px;
+  }
+  

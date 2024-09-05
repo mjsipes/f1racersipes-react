@@ -118,6 +118,12 @@ app.post("/signup", async (req, res) => {
   }
 });
 
+app.post("/hello", async (req, res) => {
+  console.log("hello");
+  res.writeHead(200, { "Content-Type": "text/plain" });
+  res.end("hellow wolfy :)");
+});
+
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
   try {

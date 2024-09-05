@@ -2,10 +2,12 @@ body {
     font: 100% Lucida Sans, Verdana;
     margin: 20px;
     line-height: 26px;
-    background-color: #f4f4f4; /* Light grey background */
+    /* background-color: #1a1a1a; */
+
+    background-color: #f4f4f4; 
   }
   
-  .wrapper {
+  .container {
     position: relative;
     overflow: auto;
     max-width: 800px; /* Set a max-width for the wrapper */

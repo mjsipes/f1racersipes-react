@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import supabase from "../supabaseClient"; // Import the initialized Supabase client
 import "../styles/pregaming.css";
 
 function Pregaming() {
@@ -9,37 +10,35 @@ function Pregaming() {
     totalWordsTyped: 0,
     bestWPM: 0,
   });
+
   useEffect(() => {
     const getUserInfo = async () => {
-      console.log("useEffect running... username grabbed from local storage");
-      const username = localStorage.getItem("username");
-      console.log("username =", username);
+      console.log("useEffect running... fetching user info from Supabase");
 
-      if (username) {
+      const { data: user } = await supabase.auth.getUser();
+      if (user) {
+        const email = user.email;
+        console.log("email =", email);
+
         try {
-          const response = await fetch("http://localhost:3001/get-user-info", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ username }),
-          });
+          const { data: account, error } = await supabase
+            .from("accounts")
+            .select(
+              "gamesplayed, gameswon, totalwordstyped, bestwordsperminute"
+            )
+            .eq("email", email)
+            .single();
 
-          if (!response.ok) {
-            const { error } = await response.json();
-            throw new Error(error || "Error fetching user data.");
+          if (error || !account) {
+            throw new Error(error ? error.message : "User not found.");
           }
 
-          const data = await response.json();
-          console.log("data =", data);
-
-          // Update state only if the account data is found
           setUserInfo({
-            userName: username,
-            gamesPlayed: data.gamesPlayed,
-            gamesWon: data.gamesWon,
-            totalWordsTyped: data.totalWordsTyped,
-            bestWPM: data.bestWPM,
+            userName: email,
+            gamesPlayed: account.gamesplayed,
+            gamesWon: account.gameswon,
+            totalWordsTyped: account.totalwordstyped,
+            bestWPM: account.bestwordsperminute,
           });
         } catch (error) {
           console.error("Error fetching data:", error);
@@ -52,8 +51,7 @@ function Pregaming() {
 
   useEffect(() => {
     console.log("Updated userInfo = ", userInfo);
-  }, [userInfo]); // This will log the state after it has been updated
-  console.log(document.cookie);
+  }, [userInfo]); // Logs the state after it has been updated
 
   return (
     <div className="wrapper">
