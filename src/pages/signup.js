@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import supabase from "../supabaseClient"; // Import Supabase client
+import supabase from "../supabaseClient";
 import "../styles/global.css";
 
 function Signup() {
@@ -8,7 +8,7 @@ function Signup() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const email = event.target.username.value; // Supabase uses email for authentication
+    const email = event.target.username.value;
     const password = event.target.password.value;
     const confirmPassword = event.target.confirm_password.value;
 
@@ -18,19 +18,17 @@ function Signup() {
     }
 
     try {
-      // Use Supabase's signUp method for registration
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
       });
 
       if (error) {
-        throw error; // Throw error to be caught by catch block
+        throw error;
       }
 
       if (data.user) {
-        localStorage.setItem("username", data.user.email); // Store the email
-        window.location.href = "/pregaming"; // Redirect to the desired page
+        window.location.href = "/pregaming";
       }
     } catch (error) {
       console.error("Error during registration:", error);
@@ -46,7 +44,6 @@ function Signup() {
         <h2>Register for F1 Racer</h2>
         <form id="registerForm" onSubmit={handleSubmit}>
           <label htmlFor="username">Email</label>{" "}
-          {/* Supabase uses email for signup */}
           <input type="email" id="username" name="username" required />
           <label htmlFor="password">Password</label>
           <input type="password" id="password" name="password" required />

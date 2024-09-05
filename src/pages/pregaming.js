@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import supabase from "../supabaseClient"; // Import the initialized Supabase client
-import "../styles/pregaming.css";
+import supabase from "../supabaseClient";
+import "../styles/global.css";
 
 function Pregaming() {
   const [userInfo, setUserInfo] = useState({
@@ -11,35 +11,34 @@ function Pregaming() {
     bestWPM: 0,
   });
 
+  const [isUserFetched, setIsUserFetched] = useState(false); // Add a state to track if the user is fetched
+
   useEffect(() => {
     const getUserInfo = async () => {
-      console.log("useEffect running... fetching user info from Supabase");
-
       const { data: user } = await supabase.auth.getUser();
-      if (user) {
-        const email = user.email;
-        console.log("email =", email);
-
+      console.log("user =", user);
+      const id = user?.user?.id;
+      if (id) {
         try {
-          const { data: account, error } = await supabase
-            .from("accounts")
-            .select(
-              "gamesplayed, gameswon, totalwordstyped, bestwordsperminute"
-            )
-            .eq("email", email)
+          let { data: profile, error } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", id)
             .single();
 
-          if (error || !account) {
+          if (error || !profile) {
             throw new Error(error ? error.message : "User not found.");
           }
+          console.log("profile =", profile);
 
           setUserInfo({
-            userName: email,
-            gamesPlayed: account.gamesplayed,
-            gamesWon: account.gameswon,
-            totalWordsTyped: account.totalwordstyped,
-            bestWPM: account.bestwordsperminute,
+            userName: profile.username,
+            gamesPlayed: profile.games_played,
+            gamesWon: profile.games_won,
+            totalWordsTyped: profile.total_words_typed,
+            bestWPM: profile.best_words_per_minute,
           });
+          setIsUserFetched(true);
         } catch (error) {
           console.error("Error fetching data:", error);
         }
@@ -49,35 +48,37 @@ function Pregaming() {
     getUserInfo();
   }, []);
 
-  useEffect(() => {
-    console.log("Updated userInfo = ", userInfo);
-  }, [userInfo]); // Logs the state after it has been updated
-
   return (
-    <div className="wrapper">
-      <div className="header">
-        <img src="F1RacerLogo.png" alt="F1 Racer Logo" />
-        <h1>
-          Prepare to Race, <span id="userName">{userInfo.userName}</span>
-        </h1>
-      </div>
-      <div>
-        <h1 className="player-stats">
-          Player Statistics:{" "}
-          <span id="gamesPlayed">{userInfo.gamesPlayed}</span> games played.{" "}
-          <span id="gamesWon">{userInfo.gamesWon}</span> games won.{" "}
-          <span id="totalWordsTyped">{userInfo.totalWordsTyped}</span> total
-          words typed. <span id="bestWPM">{userInfo.bestWPM}</span> = WPM
-          highscore.
-        </h1>
-      </div>
+    <div className="container">
+      <header className="header">
+        <img src="F1RacerLogo.png" alt="F1 Racer Logo" className="logo1" />
+        <h2>
+          Prepare to race <span>{userInfo.userName}</span>
+        </h2>
+      </header>
+
+      <section
+        className="player-stats"
+        style={{ display: isUserFetched ? "block" : "none" }}
+      >
+        <p>
+          <span>{userInfo.gamesPlayed}</span> games played.{" "}
+          <span>{userInfo.gamesWon}</span> games won.{" "}
+          <span>{userInfo.totalWordsTyped}</span> total words typed.{" "}
+          <span>{userInfo.bestWPM}</span> WPM highscore.
+        </p>
+      </section>
+
       <img src="/Racetrack.png" alt="Racetrack" className="racetrack-image" />
-      <a href="/startgame" className="button">
-        Start Game
-      </a>
-      <a href="/joingame" className="button">
-        Join Game
-      </a>
+
+      <div className="button-group">
+        <a href="/startgame" className="button">
+          Start Game
+        </a>
+        <a href="/joingame" className="button">
+          Join Game
+        </a>
+      </div>
     </div>
   );
 }

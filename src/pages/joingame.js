@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "../styles/joingame.css"; // Update with your CSS file path
+import "../styles/joingame.css";
 
 function JoinGame() {
   const [gameServerName, setGameServerName] = useState("");

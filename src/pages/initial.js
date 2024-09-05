@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import supabase from "../supabaseClient";
 import "../styles/global.css";
 
 // Reusable Button Component
@@ -61,7 +62,11 @@ function Initial() {
       {showModal && (
         <Modal
           onClose={() => setShowModal(false)}
-          onContinue={() => redirectTo("/pregaming")}
+          onContinue={async () => {
+            const { error } = await supabase.auth.signOut();
+            if (!error) redirectTo("/pregaming");
+            else console.error("Error logging out:", error.message);
+          }}
         />
       )}
     </div>

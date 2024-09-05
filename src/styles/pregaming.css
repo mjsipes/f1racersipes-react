@@ -1,66 +1,52 @@
-body {
-    font: 100% Lucida Sans, Verdana;
-    margin: 20px;
-    line-height: 26px;
-    background-color: #f4f4f4;
-  }
-  
-  .wrapper {
-    position: relative;
-    overflow: auto;
-    max-width: 800px;
-    margin: auto;
-    border: 2px solid #e74c3c; /* Red border */
-    border-radius: 8px; /* Rounded corners for the wrapper */
-    padding: 20px; /* Padding inside the wrapper */
-  }
-  
-  .header {
+.container {
     display: flex;
-    align-items: center;
-    padding: 10px;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
   }
   
-  .header h1 {
-    color: #e74c3c; /* Red color for the text */
-    margin-left: 10px; /* Spacing after the image */
+  .content-wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+  }
+  
+  .main-content {
+    flex: 3; /* Take up 3 parts of the available space */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
   
   .player-stats {
-    /* display: none; */
-    font-size: 80%; /* Smaller font size for game statistics */
-    color: #e74c3c;
-    margin-left: 10px;
-    margin-top: 10px; /* Spacing from the title */
-  }
-  
-  .header img {
-    height: 50px;
-  }
-  
-  .racetrack-image {
-    display: block;
+    flex: 1; /* Take up 1 part of the available space */
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    max-width: 300px; /* Restrict the width */
     width: 100%;
-    max-width: 600px;
-    margin: 20px auto;
-    border-radius: 8px; /* Rounded corners for the image */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
   
-  .button {
-    display: block;
-    padding: 15px 25px;
-    margin: 20px auto;
-    border: 1px solid #d4d4d4;
-    background-color: #e74c3c;
-    color: white;
-    text-align: center;
-    text-decoration: none;
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
-    width: 200px; /* Set a fixed width for buttons */
+  .player-stats table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
   }
   
-  .button:hover {
-    background-color: #c0392b;
+  .player-stats th,
+  .player-stats td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .player-stats th {
+    background-color: #f2f2f2;
+  }
+  
+  .player-stats tr:hover {
+    background-color: #f5f5f5;
   }
   
