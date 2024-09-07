@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
+import supabase from "../supabaseClient"; // Import your Supabase client
 import "../styles/joingame.css";
 
 function JoinGame() {
-  const [gameServerName, setGameServerName] = useState("");
+  const [id, setGameServerName] = useState("");
   const [games, setGames] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -10,19 +11,20 @@ function JoinGame() {
     fetchGames();
   }, []);
 
+  // Fetch games from the Supabase database
   const fetchGames = async () => {
     try {
-      const response = await fetch("http://localhost:3001/get-games", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (!response.ok) {
+      // Fetch games from the Supabase database
+      const { data: gamesList, error } = await supabase
+        .from("games")
+        .select("*")
+        .eq("state", "waiting"); // Fetch only games that are waiting for players
+
+      if (error) {
         throw new Error("Failed to fetch game servers.");
       }
-      const gameServerList = await response.json();
-      setGames(gameServerList);
+
+      setGames(gamesList);
     } catch (error) {
       console.error("Error:", error);
       setErrorMessage("An error occurred while fetching the game servers.");
@@ -32,21 +34,40 @@ function JoinGame() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const username = localStorage.getItem("username");
-      const response = await fetch("http://localhost:3001/join-game", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, gameServerName }),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to join game server.");
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        setErrorMessage("You must be logged in to join a game.");
+        return;
       }
+
+      // Find the selected game by its name
+      const selectedGame = games.find((game) => game.id === id);
+      if (!selectedGame) {
+        setErrorMessage("Game server not found.");
+        return;
+      }
+
+      // Insert the player into the game_players table
+      const { error: joinError } = await supabase.from("game_players").insert([
+        {
+          game_id: selectedGame.id,
+          player_id: user.id,
+          status: "playing", // Player is currently playing
+        },
+      ]);
+
+      if (joinError) {
+        throw new Error("Failed to join game: " + joinError.message);
+      }
+
+      // Redirect to the game page
       window.location.href = `/game`;
     } catch (error) {
       console.error("Error:", error);
-      setErrorMessage("An error occurred while joining the game server.");
+      setErrorMessage(error.message);
     }
   };
 
@@ -61,9 +82,9 @@ function JoinGame() {
         <input
           type="text"
           id="gameServerInput"
-          name="gameServerName"
-          placeholder="Enter the name of a game server below to join."
-          value={gameServerName}
+          name="gameServerid"
+          placeholder="Enter the id of a game server below to join."
+          value={id}
           onChange={(e) => setGameServerName(e.target.value)}
           required
         />
