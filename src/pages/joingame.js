@@ -7,18 +7,12 @@ function JoinGame() {
   const [games, setGames] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
 
-  useEffect(() => {
-    fetchGames();
-  }, []);
-
-  // Fetch games from the Supabase database
   const fetchGames = async () => {
     try {
-      // Fetch games from the Supabase database
       const { data: gamesList, error } = await supabase
         .from("games")
         .select("*")
-        .eq("state", "waiting"); // Fetch only games that are waiting for players
+        .eq("state", "waiting");
 
       if (error) {
         throw new Error("Failed to fetch game servers.");
@@ -30,6 +24,28 @@ function JoinGame() {
       setErrorMessage("An error occurred while fetching the game servers.");
     }
   };
+
+  useEffect(() => {
+    fetchGames();
+
+    const subscription = supabase
+      .channel("games")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "games" },
+        () => {
+          console.log("Change detected, refreshing games list.");
+          fetchGames();
+        }
+      )
+      .subscribe((status) => {
+        console.log("Subscription status:", status);
+      });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
