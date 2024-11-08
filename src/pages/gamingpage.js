@@ -19,25 +19,15 @@ function GamingPage() {
     bestWPM: 0,
   });
 
-  interface Player {
-    playerId: string; // or number, depending on the type of player_id in your database
-    userName: string;
-    status: string;
-  }
-
   // Game state
   const [gameId, setGameId] = useState(null);
   const [gameName, setGameName] = useState("");
   /**
    * @type {Player[]}
    */
-  const [players, setPlayers] = useState([]); // Player array state
-  const [isLoading, setIsLoading] = useState(true);
+  const [players, setPlayers] = useState([]);
 
-  //game state
-  const [gameStart, setGameStart] = useState(false);
-  const [gameStop, setGameStop] = useState(false);
-  const [prompt, setPrompt] = useState("whois@43"); // Initial prompt state
+  const [prompt, setPrompt] = useState("whois@43");
 
   // Player state
   const [response, setResponse] = useState("");
@@ -55,7 +45,6 @@ function GamingPage() {
   const startTimeRef = useRef(null);
   const intervalRef = useRef(null);
 
-  // Use refs for other state values that require preservation across renders
   const typingInputRef = useRef(null);
 
   //
@@ -69,98 +58,187 @@ function GamingPage() {
   //
 
   //
+
   // getUserInfo
+  const getUserInfo = async () => {
+    console.log("Fetching user info...");
+    try {
+      const { data: user, error: authError } = await supabase.auth.getUser();
+
+      if (authError || !user) {
+        console.error("Authentication error:", authError);
+        return;
+      }
+
+      console.log("Authenticated user:", user);
+
+      const userId = user.user.id;
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", userId)
+        .single();
+
+      if (profileError || !profile) {
+        console.error("Profile fetch error:", profileError);
+        return;
+      }
+
+      console.log("User profile fetched:", profile);
+
+      setUserInfo({
+        id: userId,
+        userName: profile.username,
+        gamesPlayed: profile.games_played,
+        gamesWon: profile.games_won,
+        totalWordsTyped: profile.total_words_typed,
+        bestWPM: profile.best_words_per_minute,
+      });
+    } catch (error) {
+      console.error("Unexpected error fetching user info:", error.message);
+    }
+  };
+
+  //
+
+  // Fetch Game Details
+  const fetchGameDetails = async (userInfo, setGameId) => {
+    if (!userInfo) return;
+
+    console.log("Fetching game details...");
+    try {
+      const { data: gamePlayerData, error: gameError } = await supabase
+        .from("game_players")
+        .select("*")
+        .eq("player_id", userInfo.id)
+        .single();
+
+      if (gameError) {
+        console.error("Game details fetch error:", gameError.message);
+        return;
+      }
+
+      console.log("Game details fetched:", gamePlayerData);
+      setGameId(gamePlayerData.game_id);
+    } catch (error) {
+      console.error("Error fetching game details:", error.message);
+    }
+  };
+
+  //
+
+  // Fetch Players in a Game
+  const fetchPlayers = async (gameId, setPlayers) => {
+    if (!gameId) return;
+
+    console.log("Fetching players...");
+    try {
+      const { data: playersData, error: playersError } = await supabase
+        .from("game_players")
+        .select("*")
+        .eq("game_id", gameId)
+        .order("player_id");
+
+      if (playersError || !playersData) {
+        throw new Error(playersError || "Players data not found.");
+      }
+
+      setPlayers(
+        playersData.map((player) => ({
+          playerId: player.player_id,
+          userName: player.username,
+          status: player.status,
+        }))
+      );
+    } catch (error) {
+      console.error("Error fetching players:", error.message);
+    }
+  };
+
+  //
+
+  // Update Player Status
+  const updatePlayerStatus = async () => {
+    console.log("Updating player status...");
+    if (!gameId || percentComplete === null) return;
+    try {
+      const { error } = await supabase
+        .from("game_players")
+        .update({ status: percentComplete })
+        .eq("game_id", gameId)
+        .eq("player_id", userInfo.id);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      console.log(`Player status updated to ${percentComplete}%`);
+    } catch (error) {
+      console.error("Error updating player status:", error.message);
+    }
+  };
+
+  //
+
+  //
+
   useEffect(() => {
-    const getUserInfo = async () => {
+    const setWinner = async () => {
+      if (!isWinner || !gameId || !userInfo?.id) {
+        console.log("Conditions not met for setting winner:", {
+          isWinner,
+          gameId,
+          userInfo,
+        });
+        return;
+      }
+
+      console.log("Setting winner in database...");
+      console.log("gameId", gameId);
+      console.log("userInfo", "-", userInfo.id, "-");
+
       try {
-        const { data: user, error: authError } = await supabase.auth.getUser();
-        console.log("user: ", user);
-        console.log("error: ", authError);
-
-        const userId = user.user.id;
-        const { data: profile, error: profileError } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", userId)
+        const { data: gameWin, error: gameWinError } = await supabase
+          .from("games")
+          .update({ winner: userInfo.userName }) // Update winner with the user's ID
+          .eq("id", gameId) // Ensure the correct game is updated
           .single();
+        console.log("gameWin", gameWin);
+        console.log("gameWinError", gameWinError);
 
-        if (profileError || !profile) {
-          console.error("Profile error:", profileError);
-          return;
+        if (gameWinError) {
+          throw new Error(gameWinError.message);
         }
 
-        console.log("Profile fetched:", profile);
-
-        setUserInfo({
-          id: userId,
-          userName: profile.username,
-          gamesPlayed: profile.games_played,
-          gamesWon: profile.games_won,
-          totalWordsTyped: profile.total_words_typed,
-          bestWPM: profile.best_words_per_minute,
-        });
+        console.log("Winner updated successfully in games table:", gameWin);
       } catch (error) {
-        console.error("Unexpected error fetching user info:", error.message);
+        console.error("Error updating winner in games table:", error.message);
       }
     };
 
+    setWinner();
+  }, [isWinner, gameId, userInfo]);
+
+  //
+
+  //
+
+  // Subscriptions and Effects
+  useEffect(() => {
     getUserInfo();
   }, []);
 
-  // Fetch game details
   useEffect(() => {
-    const fetchGameDetails = async () => {
-      if (!userInfo) return;
+    fetchGameDetails(userInfo, setGameId);
+  }, [userInfo]);
 
-      try {
-        const { data: gamePlayerData, error: gameError } = await supabase
-          .from("game_players")
-          .select("*")
-          .eq("player_id", userInfo.id)
-          .single();
-        console.log("Game details fetched:", gamePlayerData);
-        setGameId(gamePlayerData.game_id);
-      } catch (error) {
-        console.error("Error fetching game details:", error.message);
-      }
-    };
-
-    fetchGameDetails();
-  }, [userInfo]); // Runs whenever `userInfo` changes
-
-  // fetch plays and subscription code occurs here
   useEffect(() => {
-    const fetchPlayers = async () => {
-      if (!gameId) return; // Wait for gameId to load
+    fetchPlayers(gameId, setPlayers);
+  }, [gameId]);
 
-      try {
-        const { data: playersData, error: playersError } = await supabase
-          .from("game_players")
-          .select("*")
-          .eq("game_id", gameId)
-          .order("player_id");
+  useEffect(() => {
+    if (!gameId) return;
 
-        if (playersError || !playersData) {
-          throw new Error(playersError || "Players data not found.");
-        }
-
-        setPlayers(
-          playersData.map((player) => ({
-            playerId: player.player_id,
-            userName: player.username,
-            status: player.status,
-          }))
-        );
-      } catch (error) {
-        console.error("Error fetching players:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchPlayers();
-
-    // Set up subscription for real-time updates
     const subscription = supabase
       .channel("game_players")
       .on(
@@ -171,75 +249,50 @@ function GamingPage() {
           table: "game_players",
           filter: `game_id=eq.${gameId}`,
         },
-        () => {
-          console.log("Change detected, refreshing players list.");
-          fetchPlayers(); // Re-fetch players on any change
+        (payload) => {
+          console.log("Game players subscription triggered:", payload);
+          fetchPlayers(gameId, setPlayers);
         }
       )
-      .subscribe((status) => {
-        console.log("Player subscription status:", status);
-      });
+      .subscribe();
 
     return () => {
       subscription.unsubscribe();
     };
   }, [gameId]);
 
+  //
+
+  //
   useEffect(() => {
-    const updatePlayerStatus = async () => {
-      if (!gameId || percentComplete === null) return; // Ensure gameId is available and percentComplete is valid
-
-      try {
-        const { error } = await supabase
-          .from("game_players")
-          .update({ status: percentComplete }) // Update status to match percentComplete
-          .eq("game_id", gameId)
-          .eq("player_id", userInfo.id); // Use the current player's ID
-
-        if (error) {
-          throw new Error(error.message);
+    if (!gameId) return;
+    const winnerSubscription = supabase
+      .channel("game_winners")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "games",
+          filter: `id=eq.${gameId}`,
+        },
+        (payload) => {
+          console.log("Winner subscription triggered:", payload);
+          console.log("winner:", payload.new.winner);
+          if (payload.new.winner !== userInfo.userName) {
+            setIsWinner(false);
+            document.getElementById("endOfGameMessage").textContent =
+              "You lose :(";
+          }
         }
+      )
+      .subscribe();
 
-        console.log(`Player status updated to ${percentComplete}%`);
-      } catch (error) {
-        console.error("Error updating player status:", error);
-      }
+    return () => {
+      winnerSubscription.unsubscribe();
     };
+  }, [gameId]);
 
-    const checkForWin = async () => {
-      if (!gameId || percentComplete === null) return; // Ensure gameId is available and percentComplete is valid
-      if (percentComplete !== 100) return; // Only check for win if the player has completed the prompt (100%)
-
-      try {
-        const { data: gameWin, error: gameWinError } = await supabase
-          .from("games")
-          .select("winner")
-          .eq("id", gameId)
-          .single();
-        console.log("Game win data:", gameWin);
-      } catch (error) {
-        console.error("Error checking for win:", error);
-      }
-
-      try {
-        const { error } = await supabase
-          .from("game_players")
-          .update({ status: percentComplete }) // Update status to match percentComplete
-          .eq("game_id", gameId)
-          .eq("player_id", userInfo.id); // Use the current player's ID
-
-        if (error) {
-          throw new Error(error.message);
-        }
-
-        console.log(`Player status updated to ${percentComplete}%`);
-      } catch (error) {
-        console.error("Error updating player status:", error);
-      }
-    };
-
-    updatePlayerStatus();
-  }, [percentComplete, gameId]); // Run whenever percentComplete or gameId changes
   //
 
   //
@@ -270,6 +323,10 @@ function GamingPage() {
     updatePercentComplete(newResponse);
     updateIsWinnerOrLoser();
   };
+
+  useEffect(() => {
+    updatePlayerStatus();
+  }, [percentComplete, gameId]);
 
   const updateTimer = () => {
     const elapsed = (new Date() - startTimeRef.current) / 1000; // Time in seconds
@@ -331,12 +388,12 @@ function GamingPage() {
     <div className="container">
       <div className="header">
         <img src="/F1RacerLogo.png" alt="F1 Racer Logo" />
-        <h1>
+        <h2>
           F1Racer, <span>{userInfo.userName}</span>, playing in
           {gameName}
           <span id="gameServerName"></span>
           <span id="endOfGameMessage"></span>
-        </h1>
+        </h2>
       </div>
 
       <h1 className="game-stats">

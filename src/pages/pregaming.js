@@ -48,6 +48,12 @@ function Pregaming() {
     getUserInfo();
   }, []);
 
+  //
+
+  //
+
+  //
+
   return (
     <div className="container">
       <header className="header">
