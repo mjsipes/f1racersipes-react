@@ -3,7 +3,6 @@ import supabase from "../supabaseClient"; // Import your Supabase client
 import "../styles/joingame.css";
 
 function JoinGame() {
-  const [id, setGameServerName] = useState("");
   const [games, setGames] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -47,8 +46,7 @@ function JoinGame() {
     };
   }, []);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleSubmit = async (selectedGameId) => {
     try {
       const {
         data: { user },
@@ -59,8 +57,8 @@ function JoinGame() {
         return;
       }
 
-      // Find the selected game by its name
-      const selectedGame = games.find((game) => game.id === id);
+      // Find the selected game by its ID
+      const selectedGame = games.find((game) => game.id === selectedGameId);
       if (!selectedGame) {
         setErrorMessage("Game server not found.");
         return;
@@ -71,7 +69,7 @@ function JoinGame() {
         {
           game_id: selectedGame.id,
           player_id: user.id,
-          status: "playing", // Player is currently playing
+          status: 0, // Player is currently playing
         },
       ]);
 
@@ -93,26 +91,11 @@ function JoinGame() {
         <img src="/F1RacerLogo.png" alt="F1 Racer Logo" />
         <h2>Join a Race</h2>
       </div>
-      <form id="gameServerForm" onSubmit={handleSubmit}>
-        <label htmlFor="gameServerInput">Game Server Name</label>
-        <input
-          type="text"
-          id="gameServerInput"
-          name="gameServerid"
-          placeholder="Enter the id of a game server below to join."
-          value={id}
-          onChange={(e) => setGameServerName(e.target.value)}
-          required
-        />
-        <button type="submit" className="button">
-          Join Game
-        </button>
-      </form>
       {errorMessage && <p className="error-message">{errorMessage}</p>}
       <span id="gameServerNote">
         {games.length === 0
           ? "No games yet!"
-          : "Below are all the current games. Enter the name of the game server you would like to join!"}
+          : "Click on a game row below to join!"}
       </span>
       <span id="gameServerTable">
         {games.length > 0 && (
@@ -125,8 +108,12 @@ function JoinGame() {
               </tr>
             </thead>
             <tbody>
-              {games.map((game, index) => (
-                <tr key={index}>
+              {games.map((game) => (
+                <tr
+                  key={game.id}
+                  onClick={() => handleSubmit(game.id)}
+                  style={{ cursor: "pointer" }}
+                >
                   {Object.values(game).map((value, index) => (
                     <td key={index}>{value}</td>
                   ))}
