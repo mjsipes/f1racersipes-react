@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from "react";
 import supabase from "../supabaseClient"; // Import your Supabase client
+import { useUser } from "../hooks/useUser";
+
 import "../styles/joingame.css";
 
 function JoinGame() {
+  const { user, loading, error } = useUser();
+  console.log(user);
+
   const [games, setGames] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -70,6 +75,7 @@ function JoinGame() {
           game_id: selectedGame.id,
           player_id: user.id,
           status: 0, // Player is currently playing
+          username: user.email,
         },
       ]);
 
@@ -102,9 +108,11 @@ function JoinGame() {
           <table>
             <thead>
               <tr>
-                {Object.keys(games[0]).map((key) => (
-                  <th key={key}>{key}</th>
-                ))}
+                {/* Define headers explicitly */}
+                <th>Game Name</th>
+                <th>ID</th>
+                <th>Created At</th>
+                <th>Winner</th>
               </tr>
             </thead>
             <tbody>
@@ -114,9 +122,11 @@ function JoinGame() {
                   onClick={() => handleSubmit(game.id)}
                   style={{ cursor: "pointer" }}
                 >
-                  {Object.values(game).map((value, index) => (
-                    <td key={index}>{value}</td>
-                  ))}
+                  {/* Render only the selected properties in the desired order */}
+                  <td>{game.game_name}</td>
+                  <td>{game.id}</td>
+                  <td>{game.created_at}</td>
+                  <td>{game.winner}</td>
                 </tr>
               ))}
             </tbody>
