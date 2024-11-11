@@ -1,52 +1,59 @@
 import React, { useState, useEffect } from "react";
+import supabase from "../supabaseClient";
 
 const Chat = () => {
-  const [ws, setWs] = useState(null);
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState("");
+  const [messages, setMessages] = useState([]); // List of messages
+  const [newMessage, setNewMessage] = useState(""); // Message input
 
   useEffect(() => {
-    const websocket = new WebSocket("ws://localhost:3001");
-    websocket.onmessage = (event) => {
-      if (event.data instanceof Blob) {
-        // If the message is a Blob, read it as text
-        const reader = new FileReader();
-        reader.onload = () => {
-          setMessages((prev) => [...prev, reader.result]);
-        };
-        reader.readAsText(event.data);
-      } else {
-        // If it's not a Blob, handle it as a string directly
-        setMessages((prev) => [...prev, event.data]);
-      }
-    };
-    setWs(websocket);
+    // Set up a Supabase channel for real-time chat messages
+    const channel = supabase.channel("chat-room");
 
+    // Listen for incoming messages
+    channel
+      .on("broadcast", { event: "new-message" }, (payload) => {
+        setMessages((prevMessages) => [...prevMessages, payload]);
+      })
+      .subscribe();
+
+    // Cleanup on component unmount
     return () => {
-      websocket.close();
+      channel.unsubscribe();
     };
   }, []);
 
-  const sendMessage = () => {
-    if (ws && input.trim()) {
-      ws.send(input);
-      setInput("");
+  // Function to send a new message
+  const sendMessage = async () => {
+    if (newMessage.trim() !== "") {
+      // Broadcast the message to other clients in the "chat-room" channel
+      await supabase.channel("chat-room").send({
+        type: "broadcast",
+        event: "new-message",
+        payload: {
+          content: newMessage,
+          timestamp: new Date().toLocaleTimeString(),
+        },
+      });
+      setNewMessage(""); // Clear the input field
     }
   };
 
   return (
     <div>
-      <h1>Chat</h1>
-      <ul>
+      <h2>Simple Chat</h2>
+      <div className="chat-box">
         {messages.map((msg, index) => (
-          <li key={index}>{msg}</li>
+          <div key={index} className="message">
+            <span>{msg.payload.timestamp}: </span>
+            {msg.payload.content}
+          </div>
         ))}
-      </ul>
+      </div>
       <input
         type="text"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyPress={(e) => (e.key === "Enter" ? sendMessage() : null)}
+        value={newMessage}
+        onChange={(e) => setNewMessage(e.target.value)}
+        placeholder="Type your message..."
       />
       <button onClick={sendMessage}>Send</button>
     </div>
