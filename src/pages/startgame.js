@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import supabase from "../supabaseClient";
+import useJoinGame from "../hooks/useJoinGame"; // Import the hook
 import "../styles/startgame.css";
 
 function StartGame() {
@@ -7,7 +8,9 @@ function StartGame() {
   const [difficulty, setDifficulty] = useState(1);
   const [customTopic, setCustomTopic] = useState("");
   const [message, setMessage] = useState("");
-  const [gameId, setGameId] = useState(null); // Add state to store the game ID
+  const [gameId, setGameId] = useState(null);
+
+  const { joinGame, errorMessage } = useJoinGame(); // Destructure the hook
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -38,37 +41,13 @@ function StartGame() {
         throw new Error("Failed to create game: " + createError.message);
       }
 
-      // Store the game ID in state for use in the useEffect hook
+      // Set the game ID after creation
       setGameId(game.id);
 
-      const { error: joinError } = await supabase.from("game_players").insert([
-        {
-          game_id: game.id,
-          player_id: user.id,
-          status: 0,
-        },
-      ]);
+      // Call joinGame from the hook to add the player to the game
+      await joinGame(game.id);
 
-      if (joinError) {
-        throw new Error("Failed to join game: " + joinError.message);
-      }
-
-      const channel = supabase.channel(`game-${game.id}`);
-
-      channel
-        .on("broadcast", { event: "status-update" }, (payload) => {
-          console.log("Player status update received!", payload);
-        })
-        .subscribe((status) => {
-          if (status === "SUBSCRIBED") {
-            channel.send({
-              type: "broadcast",
-              event: "status-update",
-              payload: { player_id: user.id, status: "playing" },
-            });
-          }
-        });
-
+      // Redirect to the game page
       window.location.href = `/game`;
     } catch (error) {
       console.error("Error:", error);
@@ -78,7 +57,7 @@ function StartGame() {
 
   useEffect(() => {
     if (gameId) {
-      const joinGameChannel = async () => {
+      const setupChannel = async () => {
         const {
           data: { user },
         } = await supabase.auth.getUser();
@@ -86,7 +65,6 @@ function StartGame() {
         if (!user) return;
 
         const channel = supabase.channel(`game-${gameId}`);
-
         channel
           .on("broadcast", { event: "status-update" }, (payload) => {
             console.log("Received player status:", payload);
@@ -102,9 +80,9 @@ function StartGame() {
           });
       };
 
-      joinGameChannel();
+      setupChannel();
     }
-  }, [gameId]); // Run this effect when gameId changes
+  }, [gameId]);
 
   return (
     <div className="container">
@@ -154,6 +132,7 @@ function StartGame() {
       </form>
 
       {message && <p>{message}</p>}
+      {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
     </div>
   );
 }

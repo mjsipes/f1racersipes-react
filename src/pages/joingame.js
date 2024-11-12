@@ -48,6 +48,11 @@ function JoinGame() {
     };
   }, []);
 
+  const handleJoinGame = async (gameId) => {
+    await joinGame(gameId);
+    window.location.href = `/game`; // Redirect to the gaming page after joining
+  };
+
   return (
     <div className="container">
       <div className="header">
@@ -77,7 +82,7 @@ function JoinGame() {
               {games.map((game) => (
                 <tr
                   key={game.id}
-                  onClick={() => joinGame(game.id)}
+                  onClick={() => handleJoinGame(game.id)}
                   style={{ cursor: "pointer" }}
                 >
                   <td>{game.game_name}</td>
