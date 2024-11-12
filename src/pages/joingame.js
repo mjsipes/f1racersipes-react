@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import supabase from "../supabaseClient"; // Import your Supabase client
-
+import supabase from "../supabaseClient";
+import useJoinGame from "../hooks/useJoinGame";
 import "../styles/joingame.css";
 
 function JoinGame() {
   const [games, setGames] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
+  const { joinGame, errorMessage: joinErrorMessage } = useJoinGame();
 
   const fetchGames = async () => {
     try {
@@ -47,53 +48,15 @@ function JoinGame() {
     };
   }, []);
 
-  const handleSubmit = async (selectedGameId) => {
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        setErrorMessage("You must be logged in to join a game.");
-        return;
-      }
-
-      // Find the selected game by its ID
-      const selectedGame = games.find((game) => game.id === selectedGameId);
-      if (!selectedGame) {
-        setErrorMessage("Game server not found.");
-        return;
-      }
-
-      // Insert the player into the game_players table
-      const { error: joinError } = await supabase.from("game_players").insert([
-        {
-          game_id: selectedGame.id,
-          player_id: user.id,
-          status: 0, // Player is currently playing
-          username: user.email,
-        },
-      ]);
-
-      if (joinError) {
-        throw new Error("Failed to join game: " + joinError.message);
-      }
-
-      // Redirect to the game page
-      window.location.href = `/game`;
-    } catch (error) {
-      console.error("Error:", error);
-      setErrorMessage(error.message);
-    }
-  };
-
   return (
     <div className="container">
       <div className="header">
         <img src="/F1RacerLogo.png" alt="F1 Racer Logo" />
         <h2>Join a Race</h2>
       </div>
-      {errorMessage && <p className="error-message">{errorMessage}</p>}
+      {(errorMessage || joinErrorMessage) && (
+        <p className="error-message">{errorMessage || joinErrorMessage}</p>
+      )}
       <span id="gameServerNote">
         {games.length === 0
           ? "No games yet!"
@@ -104,7 +67,6 @@ function JoinGame() {
           <table>
             <thead>
               <tr>
-                {/* Define headers explicitly */}
                 <th>Game Name</th>
                 <th>ID</th>
                 <th>Created At</th>
@@ -115,10 +77,9 @@ function JoinGame() {
               {games.map((game) => (
                 <tr
                   key={game.id}
-                  onClick={() => handleSubmit(game.id)}
+                  onClick={() => joinGame(game.id)}
                   style={{ cursor: "pointer" }}
                 >
-                  {/* Render only the selected properties in the desired order */}
                   <td>{game.game_name}</td>
                   <td>{game.id}</td>
                   <td>{game.created_at}</td>
