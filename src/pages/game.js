@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import supabase from "../supabaseClient";
+import useUser from "../hooks/useUser";
 import "../styles/gamingpage.css";
-import { useUserProfile } from "../hooks/useUserProfile";
 
 /**
  * @typedef {Object} Player
@@ -11,8 +11,9 @@ import { useUserProfile } from "../hooks/useUserProfile";
  */
 
 function Game() {
-  const { user, loading, error } = useUserProfile();
-  console.log(user);
+  const { user, loading, error } = useUser();
+  console.log("hi here is userprogile", user);
+
   const [userInfo, setUserInfo] = useState({
     id: "",
     userName: "",
@@ -228,7 +229,7 @@ function Game() {
 
   // Subscriptions and Effects
   useEffect(() => {
-    getUserInfo();
+    // getUserInfo();
   }, []);
 
   useEffect(() => {
