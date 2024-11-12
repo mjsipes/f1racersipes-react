@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import supabase from "../supabaseClient";
 
-export const useUserProfile = () => {
-  const [userProfile, setUserProfile] = useState(null); // Renamed from user to userProfile
+const useUserProfile = () => {
+  const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -26,8 +26,8 @@ export const useUserProfile = () => {
           throw new Error(profileError?.message || "Profile not found.");
         }
 
-        setUserProfile(profile); // Set userProfile with profile data
-        setError(null); // Clear any previous error
+        setUserProfile(profile);
+        setError(null);
       } catch (err) {
         console.error("Error fetching user data:", err);
         setError(err.message);
@@ -39,7 +39,7 @@ export const useUserProfile = () => {
     getUserProfile();
   }, []);
 
-  return { userProfile, loading, error }; // Return userProfile instead of user
+  return { userProfile, loading, error };
 };
 
 export default useUserProfile;

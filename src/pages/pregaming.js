@@ -1,7 +1,7 @@
 import React from "react";
 import "../styles/global.css";
 import useUser from "../hooks/useUser";
-import { useUserProfile } from "../hooks/useUserProfile";
+import useUserProfile from "../hooks/useUserProfile";
 
 function Pregaming() {
   const { user, loading: userLoading, error: userError } = useUser();

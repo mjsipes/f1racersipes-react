@@ -27,7 +27,6 @@ function StartGame() {
         .insert([
           {
             prompt: customTopic || "Random Prompt",
-            created_by: user.id,
             state: "waiting",
             game_name: gameServerName,
           },
