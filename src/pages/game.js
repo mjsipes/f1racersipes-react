@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import supabase from "../supabaseClient";
 import "../styles/gamingpage.css";
-import { useUser } from "../hooks/useUser";
+import { useUserProfile } from "../hooks/useUserProfile";
 
 /**
  * @typedef {Object} Player
@@ -11,7 +11,7 @@ import { useUser } from "../hooks/useUser";
  */
 
 function Game() {
-  const { user, loading, error } = useUser();
+  const { user, loading, error } = useUserProfile();
   console.log(user);
   const [userInfo, setUserInfo] = useState({
     id: "",

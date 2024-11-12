@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import supabase from "../supabaseClient"; // Import your Supabase client
-import { useUser } from "../hooks/useUser";
+import { useUserProfile } from "../hooks/useUserProfile";
 
 import "../styles/joingame.css";
 
 function JoinGame() {
-  const { user, loading, error } = useUser();
+  const { user, loading, error } = useUserProfile();
   console.log(user);
 
   const [games, setGames] = useState([]);

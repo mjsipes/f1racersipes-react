@@ -1,9 +1,9 @@
 import React from "react";
 import "../styles/global.css";
-import { useUser } from "../hooks/useUser";
+import { useUserProfile } from "../hooks/useUserProfile";
 
 function Pregaming() {
-  const { user, loading, error } = useUser();
+  const { user, loading, error } = useUserProfile();
   console.log(user);
 
   if (loading) return <div>Loading...</div>;
