@@ -63,9 +63,15 @@ function Initial() {
         <Modal
           onClose={() => setShowModal(false)}
           onContinue={async () => {
-            const { error } = await supabase.auth.signOut();
-            if (!error) redirectTo("/pregaming");
-            else console.error("Error logging out:", error.message);
+            {
+              const { data, error } = await supabase.auth.signInAnonymously();
+            }
+            {
+              const { data, error } = await supabase.auth.updateUser({
+                data: { userName: "guest", full_name: "guest" },
+              });
+            }
+            redirectTo("/pregaming");
           }}
         />
       )}
