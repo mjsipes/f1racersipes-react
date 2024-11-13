@@ -29,7 +29,8 @@ function StartGame() {
         .from("games")
         .insert([
           {
-            prompt: customTopic || "Random Prompt",
+            customTopic: customTopic,
+            difficulty: difficulty,
             state: "waiting",
             game_name: gameServerName,
           },

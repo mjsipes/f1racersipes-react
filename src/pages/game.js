@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import supabase from "../supabaseClient";
 import useUser from "../hooks/useUser";
-import "../styles/gamingpage.css";
+import "../styles/game.css";
 
 /**
  * @typedef {Object} Player
@@ -12,16 +12,7 @@ import "../styles/gamingpage.css";
 
 function Game() {
   const { user, loading, error } = useUser();
-  console.log("hi here is userprogile", user);
-
-  const [userInfo, setUserInfo] = useState({
-    id: "",
-    userName: "",
-    gamesPlayed: 0,
-    gamesWon: 0,
-    totalWordsTyped: 0,
-    bestWPM: 0,
-  });
+  console.log("User:", user);
 
   // Game state
   const [gameId, setGameId] = useState(null);
@@ -63,58 +54,16 @@ function Game() {
 
   //
 
-  // getUserInfo
-  const getUserInfo = async () => {
-    console.log("Fetching user info...");
-    try {
-      const { data: user, error: authError } = await supabase.auth.getUser();
-
-      if (authError || !user) {
-        console.error("Authentication error:", authError);
-        return;
-      }
-
-      console.log("Authenticated user:", user);
-
-      const userId = user.user.id;
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", userId)
-        .single();
-
-      if (profileError || !profile) {
-        console.error("Profile fetch error:", profileError);
-        return;
-      }
-
-      console.log("User profile fetched:", profile);
-
-      setUserInfo({
-        id: userId,
-        userName: profile.username,
-        gamesPlayed: profile.games_played,
-        gamesWon: profile.games_won,
-        totalWordsTyped: profile.total_words_typed,
-        bestWPM: profile.best_words_per_minute,
-      });
-    } catch (error) {
-      console.error("Unexpected error fetching user info:", error.message);
-    }
-  };
-
-  //
-
   // Fetch Game Details
-  const fetchGameDetails = async (userInfo, setGameId) => {
-    if (!userInfo) return;
+  const fetchGameDetails = async (user, setGameId) => {
+    if (!user) return;
 
     console.log("Fetching game details...");
     try {
       const { data: gamePlayerData, error: gameError } = await supabase
         .from("game_players")
         .select("*")
-        .eq("player_id", userInfo.id)
+        .eq("player_id", user.id)
         .single();
 
       if (gameError) {
@@ -170,7 +119,7 @@ function Game() {
         .from("game_players")
         .update({ status: percentComplete })
         .eq("game_id", gameId)
-        .eq("player_id", userInfo.id);
+        .eq("player_id", user.id);
 
       if (error) {
         throw new Error(error.message);
@@ -186,42 +135,34 @@ function Game() {
 
   //
 
-  useEffect(() => {
-    const setWinner = async () => {
-      if (!isWinner || !gameId || !userInfo?.id) {
-        console.log("Conditions not met for setting winner:", {
-          isWinner,
-          gameId,
-          userInfo,
-        });
-        return;
-      }
+  // useEffect(() => {
+  //   const setWinner = async () => {
+  //     if (!isWinner || !gameId || !user?.id) {
+  //       console.log("No winner or game ID or user ID found");
+  //       return;
+  //     }
 
-      console.log("Setting winner in database...");
-      console.log("gameId", gameId);
-      console.log("userInfo", "-", userInfo.id, "-");
+  //     try {
+  //       const { data: gameWin, error: gameWinError } = await supabase
+  //         .from("games")
+  //         .update({ winner: user.user_metadata.userName }) // Update winner with the user's ID
+  //         .eq("id", gameId) // Ensure the correct game is updated
+  //         .single();
+  //       console.log("gameWin", gameWin);
+  //       console.log("gameWinError", gameWinError);
 
-      try {
-        const { data: gameWin, error: gameWinError } = await supabase
-          .from("games")
-          .update({ winner: userInfo.userName }) // Update winner with the user's ID
-          .eq("id", gameId) // Ensure the correct game is updated
-          .single();
-        console.log("gameWin", gameWin);
-        console.log("gameWinError", gameWinError);
+  //       if (gameWinError) {
+  //         throw new Error(gameWinError.message);
+  //       }
 
-        if (gameWinError) {
-          throw new Error(gameWinError.message);
-        }
+  //       console.log("Winner updated successfully in games table:", gameWin);
+  //     } catch (error) {
+  //       console.error("Error updating winner in games table:", error.message);
+  //     }
+  //   };
 
-        console.log("Winner updated successfully in games table:", gameWin);
-      } catch (error) {
-        console.error("Error updating winner in games table:", error.message);
-      }
-    };
-
-    setWinner();
-  }, [isWinner, gameId, userInfo]);
+  //   setWinner();
+  // }, [isWinner, gameId, user]);
 
   //
 
@@ -232,13 +173,13 @@ function Game() {
     // getUserInfo();
   }, []);
 
-  useEffect(() => {
-    fetchGameDetails(userInfo, setGameId);
-  }, [userInfo]);
+  // useEffect(() => {
+  //   fetchGameDetails(user, setGameId);
+  // }, [user]);
 
-  useEffect(() => {
-    fetchPlayers(gameId, setPlayers);
-  }, [gameId]);
+  // useEffect(() => {
+  //   fetchPlayers(gameId, setPlayers);
+  // }, [gameId]);
 
   useEffect(() => {
     if (!gameId) return;
@@ -268,34 +209,34 @@ function Game() {
   //
 
   //
-  useEffect(() => {
-    if (!gameId) return;
-    const winnerSubscription = supabase
-      .channel("game_winners")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "games",
-          filter: `id=eq.${gameId}`,
-        },
-        (payload) => {
-          console.log("Winner subscription triggered:", payload);
-          console.log("winner:", payload.new.winner);
-          if (payload.new.winner !== userInfo.userName) {
-            setIsWinner(false);
-            document.getElementById("endOfGameMessage").textContent =
-              "You lose :(";
-          }
-        }
-      )
-      .subscribe();
+  // useEffect(() => {
+  //   if (!gameId) return;
+  //   const winnerSubscription = supabase
+  //     .channel("game_winners")
+  //     .on(
+  //       "postgres_changes",
+  //       {
+  //         event: "*",
+  //         schema: "public",
+  //         table: "games",
+  //         filter: `id=eq.${gameId}`,
+  //       },
+  //       (payload) => {
+  //         console.log("Winner subscription triggered:", payload);
+  //         console.log("winner:", payload.new.winner);
+  //         if (payload.new.winner !== user.user_metadata.userName) {
+  //           setIsWinner(false);
+  //           document.getElementById("endOfGameMessage").textContent =
+  //             "You lose :(";
+  //         }
+  //       }
+  //     )
+  //     .subscribe();
 
-    return () => {
-      winnerSubscription.unsubscribe();
-    };
-  }, [gameId]);
+  //   return () => {
+  //     winnerSubscription.unsubscribe();
+  //   };
+  // }, [gameId]);
 
   //
 
@@ -393,7 +334,13 @@ function Game() {
       <div className="header">
         <img src="/F1RacerLogo.png" alt="F1 Racer Logo" />
         <h2>
-          F1Racer, <span>{userInfo.userName}</span>, playing in
+          F1Racer,{" "}
+          <span>
+            {user?.user_metadata?.userName
+              ? user.user_metadata.userName
+              : "Guest"}
+          </span>
+          , playing in
           {gameName}
           <span id="gameServerName"></span>
           <span id="endOfGameMessage"></span>
