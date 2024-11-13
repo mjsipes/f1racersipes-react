@@ -22,3 +22,5 @@ miproxy channel sending lets see!
 hackscmmm password: snTjBMHVJYyIqJkL
 
 will vercel update?
+
+hi creating branch for simplifying game... experimentation.
