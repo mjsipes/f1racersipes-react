@@ -8,7 +8,6 @@ const Chat = () => {
   useEffect(() => {
     // Set up a Supabase channel for real-time chat messages
     const channel = supabase.channel("chat-room");
-
     // Listen for incoming messages
     channel
       .on("broadcast", { event: "new-message" }, (payload) => {

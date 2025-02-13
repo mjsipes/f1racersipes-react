@@ -34,7 +34,7 @@ const useJoinGame = () => {
           game_id: selectedGameId,
           player_id: user.id,
           status: 0, // Player is currently playing
-          username: user.email,
+          userName: user.email,
         },
       ]);
 

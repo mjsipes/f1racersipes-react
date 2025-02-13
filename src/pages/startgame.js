@@ -24,6 +24,16 @@ function StartGame() {
         setMessage("You must be logged in to create a game.");
         return;
       }
+      // console.log("generating prompt")
+      // const { data, error } = await supabase.functions.invoke('generate-prompt', {
+      //   body: {
+      //     "id": "22",
+      //     "difficulty": 1,
+      //     "customTopic": "dolphins"
+      //   }
+
+      // })
+      // console.log(data,error);
 
       const { data: game, error: createError } = await supabase
         .from("games")
@@ -42,14 +52,16 @@ function StartGame() {
         throw new Error("Failed to create game: " + createError.message);
       }
 
-      // Set the game ID after creation
       setGameId(game.id);
 
-      // Call joinGame from the hook to add the player to the game
       await joinGame(game.id);
-
-      // Redirect to the game page
       window.location.href = `/game`;
+      // console.log("scheduling game start");
+      // let { data, error } = await supabase.rpc("schedule_game_start", {
+      //   game_id: game.id,
+      // });
+      // if (error) console.error(error);
+      // else console.log(data);
     } catch (error) {
       console.error("Error:", error);
       setMessage(error.message);

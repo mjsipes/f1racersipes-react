@@ -11,18 +11,22 @@ import "../styles/game.css";
  */
 
 function Game() {
+    const [messages, setMessages] = useState([]); // List of messages
+    const [newMessage, setNewMessage] = useState(""); // Message input
+  
   const { user, loading, error } = useUser();
-  console.log("User:", user);
+  // console.log("User:", user);
 
   // Game state
   const [gameId, setGameId] = useState(null);
   const [gameName, setGameName] = useState("");
+  const [prompt, setPrompt] = useState(
+    "Dolphins are smart sea animals. They are excellent swimmers and can leap high above the water. They have smooth, gray skin and a playful nature. Dolphins talk to each other using clicks and whistles. They eat fish and squid."
+  );
   /**
    * @type {Player[]}
    */
   const [players, setPlayers] = useState([]);
-
-  const [prompt, setPrompt] = useState("whois@43");
 
   // Player state
   const [response, setResponse] = useState("");
@@ -53,29 +57,71 @@ function Game() {
   //
 
   //
-
-  // Fetch Game Details
-  const fetchGameDetails = async (user, setGameId) => {
-    if (!user) return;
-
-    console.log("Fetching game details...");
-    try {
-      const { data: gamePlayerData, error: gameError } = await supabase
-        .from("game_players")
-        .select("*")
-        .eq("player_id", user.id)
-        .single();
-
-      if (gameError) {
-        console.error("Game details fetch error:", gameError.message);
-        return;
-      }
-
-      console.log("Game details fetched:", gamePlayerData);
-      setGameId(gamePlayerData.game_id);
-    } catch (error) {
-      console.error("Error fetching game details:", error.message);
+  useEffect(() => {
+    if (!gameId) return; // Do not proceed if gameId is not set
+  
+    // Set up a Supabase channel specific to the game
+    const channel = supabase.channel(`game-${gameId}`);
+  
+    // Listen for incoming messages
+    channel
+      .on("broadcast", { event: "new-message" }, (payload) => {
+        setMessages((prevMessages) => [...prevMessages, payload]);
+      })
+      .subscribe();
+  
+    // Cleanup on component unmount
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [gameId]); // Re-run this effect if gameId changes
+  
+  const sendMessage = async () => {
+    if (newMessage.trim() !== "" && gameId) {
+      // Broadcast the message to other clients in the game-specific channel
+      await supabase.channel(`game-${gameId}`).send({
+        type: "broadcast",
+        event: "new-message",
+        payload: {
+          content: newMessage,
+          timestamp: new Date().toLocaleTimeString(),
+        },
+      });
+      setNewMessage(""); // Clear the input field
     }
+  };
+
+  const fetchGameDetails = async (user, setGameId, setGameName) => {
+    if (!user) {
+      console.log("No user provided");
+      return;
+    }
+
+    const { data: gamePlayerData, error: gamePlayerError } = await supabase
+      .from("game_players")
+      .select("*")
+      .eq("player_id", user.id)
+      .single();
+
+    if (gamePlayerError) {
+      console.error("Failed to fetch game player:", gamePlayerError.message);
+      return;
+    }
+
+    const { data: gameData, error: gameError } = await supabase
+      .from("games")
+      .select("*")
+      .eq("id", gamePlayerData.game_id)
+      .single();
+
+    if (gameError) {
+      console.error("Failed to fetch game:", gameError.message);
+      return;
+    }
+
+    setGameId(gamePlayerData.game_id);
+    setGameName(gameData.game_name);
+    return { gamePlayerData, gameData };
   };
 
   //
@@ -99,7 +145,7 @@ function Game() {
       setPlayers(
         playersData.map((player) => ({
           playerId: player.player_id,
-          userName: player.username,
+          userName: player.userName,
           status: player.status,
         }))
       );
@@ -130,7 +176,6 @@ function Game() {
       console.error("Error updating player status:", error.message);
     }
   };
-
   //
 
   //
@@ -173,13 +218,13 @@ function Game() {
     // getUserInfo();
   }, []);
 
-  // useEffect(() => {
-  //   fetchGameDetails(user, setGameId);
-  // }, [user]);
+  useEffect(() => {
+    fetchGameDetails(user, setGameId, setGameName);
+  }, [user]);
 
-  // useEffect(() => {
-  //   fetchPlayers(gameId, setPlayers);
-  // }, [gameId]);
+  useEffect(() => {
+    fetchPlayers(gameId, setPlayers);
+  }, [gameId]);
 
   useEffect(() => {
     if (!gameId) return;
@@ -406,6 +451,24 @@ function Game() {
       <a href="/pregaming" className="button">
         Exit Game
       </a>
+      <div>
+      <h2>Simple Chat</h2>
+      <div className="chat-box">
+        {messages.map((msg, index) => (
+          <div key={index} className="message">
+            <span>{msg.payload.timestamp}: </span>
+            {msg.payload.content}
+          </div>
+        ))}
+      </div>
+      <input
+        type="text"
+        value={newMessage}
+        onChange={(e) => setNewMessage(e.target.value)}
+        placeholder="Type your message..."
+      />
+      <button onClick={sendMessage}>Send</button>
+    </div>
     </div>
   );
 }

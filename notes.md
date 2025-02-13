@@ -10,7 +10,7 @@ drop in advisment, send email
 
 
 
-supabase edge function
-then set up develop branch
-we get one person to win and another to loose.
-miproxy channel sending lets see! / chat
+research how to do a timer.
+
+add chat feature to each game.
+and how to do a countdown??
