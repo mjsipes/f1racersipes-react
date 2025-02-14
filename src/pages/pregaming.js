@@ -1,38 +1,61 @@
 import React from "react";
+import { useState, useEffect } from "react";
 import "../styles/global.css";
-import useUser from "../hooks/useUser";
-import useUserProfile from "../hooks/useUserProfile";
+import supabase from "../supabaseClient";
 
 function Pregaming() {
-  const { user, loading: userLoading, error: userError } = useUser();
-  console.log("User", user);
-  const {
-    userProfile,
-    loading: profileLoading,
-    error: profileError,
-  } = useUserProfile();
-  console.log("userProfile: ", userProfile);
+  const [user, setUser] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
 
-  if (profileLoading) return <div>Loading...</div>;
-  if (profileError) return <div>Error: {profileError}</div>;
+  async function getUser() {
+    const { data: authData, error: authError } = await supabase.auth.getUser();
+    setUser(authData.user);
+    console.log("authData: ", authData);
+    console.log("authError: ", authError);
+  }
+
+  async function getUserProfile(user) {
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+    setUserProfile(profile);
+    console.log("profile: ", profile);
+    console.log("profileError: ", profileError);
+  }
+
+  useEffect(() => {
+    getUser();
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      getUserProfile(user);
+    }
+  }, [user]);
 
   return (
     <div className="container">
       <header className="header">
         <img src="F1RacerLogo.png" alt="F1 Racer Logo" className="logo1" />
         <h2>
-          Prepare to race <span>{user.user_metadata.userName}</span>
+          Prepare to race{" "}
+          {user?.user_metadata?.userName && (
+            <span>{user.user_metadata.userName}</span>
+          )}
         </h2>
       </header>
-
-      <section className="player-stats">
-        <p>
-          <span>{userProfile.gamesPlayed}</span> games played.{" "}
-          <span>{userProfile.gamesWon}</span> games won.{" "}
-          <span>{userProfile.totalWordsTyped}</span> total words typed.{" "}
-          <span>{userProfile.bestWpm}</span> WPM highscore.
-        </p>
-      </section>
+      {userProfile && (
+        <section className="player-stats">
+          <p>
+            <span>{userProfile.gamesPlayed}</span> games played.{" "}
+            <span>{userProfile.gamesWon}</span> games won.{" "}
+            <span>{userProfile.totalWordsTyped}</span> total words typed.{" "}
+            <span>{userProfile.bestWpm}</span> WPM highscore.
+          </p>
+        </section>
+      )}
 
       <img src="/Racetrack.png" alt="Racetrack" className="racetrack-image" />
 

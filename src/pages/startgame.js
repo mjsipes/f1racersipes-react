@@ -1,101 +1,43 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import supabase from "../supabaseClient";
-import useJoinGame from "../hooks/useJoinGame"; // Import the hook
+import useJoinGame from "../hooks/useJoinGame";
 import "../styles/startgame.css";
 
 function StartGame() {
-  const [gameServerName, setgameServerName] = useState("");
+  const [gameServerName, setGameServerName] = useState("");
   const [difficulty, setDifficulty] = useState(1);
   const [customTopic, setCustomTopic] = useState("");
   const [message, setMessage] = useState("");
-  const [gameId, setGameId] = useState(null);
 
-  const { joinGame, errorMessage } = useJoinGame(); // Destructure the hook
+  const { joinGame, errorMessage } = useJoinGame();
 
-  const handleSubmit = async (event) => {
+  async function handleSubmit(event) {
     event.preventDefault();
-
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        setMessage("You must be logged in to create a game.");
+    const { data: user } = await supabase.auth.getUser();
+    if (!user) {
+      setMessage("You must be logged in to create a game.");
+      return;
+    }
+    const { data: game, error: insertError } = await supabase
+      .from("games")
+      .insert([
+        {
+          customTopic: customTopic,
+          difficulty: difficulty,
+          state: "waiting",
+          game_name: gameServerName,
+        },
+      ])
+      .select()
+      .single();
+      console.log("game: ", game);
+      if (insertError) {
+        setMessage("Failed to create game: " + insertError.message);
         return;
       }
-      // console.log("generating prompt")
-      // const { data, error } = await supabase.functions.invoke('generate-prompt', {
-      //   body: {
-      //     "id": "22",
-      //     "difficulty": 1,
-      //     "customTopic": "dolphins"
-      //   }
-
-      // })
-      // console.log(data,error);
-
-      const { data: game, error: createError } = await supabase
-        .from("games")
-        .insert([
-          {
-            customTopic: customTopic,
-            difficulty: difficulty,
-            state: "waiting",
-            game_name: gameServerName,
-          },
-        ])
-        .select()
-        .single();
-
-      if (createError) {
-        throw new Error("Failed to create game: " + createError.message);
-      }
-
-      setGameId(game.id);
-
-      await joinGame(game.id);
-      window.location.href = `/game`;
-      // console.log("scheduling game start");
-      // let { data, error } = await supabase.rpc("schedule_game_start", {
-      //   game_id: game.id,
-      // });
-      // if (error) console.error(error);
-      // else console.log(data);
-    } catch (error) {
-      console.error("Error:", error);
-      setMessage(error.message);
-    }
-  };
-
-  useEffect(() => {
-    if (gameId) {
-      const setupChannel = async () => {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-
-        if (!user) return;
-
-        const channel = supabase.channel(`game-${gameId}`);
-        channel
-          .on("broadcast", { event: "status-update" }, (payload) => {
-            console.log("Received player status:", payload);
-          })
-          .subscribe((status) => {
-            if (status === "SUBSCRIBED") {
-              channel.send({
-                type: "broadcast",
-                event: "status-update",
-                payload: { player_id: user.id, status: "joined" },
-              });
-            }
-          });
-      };
-
-      setupChannel();
-    }
-  }, [gameId]);
+    await joinGame(game.id);
+    window.location.href = `/game`;
+  }
 
   return (
     <div className="container">
@@ -112,7 +54,7 @@ function StartGame() {
           className="topic-box"
           placeholder="Enter name for your game server"
           value={gameServerName}
-          onChange={(e) => setgameServerName(e.target.value)}
+          onChange={(e) => setGameServerName(e.target.value)}
           required
         />
 

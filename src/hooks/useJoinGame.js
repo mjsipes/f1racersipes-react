@@ -2,7 +2,7 @@
 import { useState } from "react";
 import supabase from "../supabaseClient";
 
-const useJoinGame = () => {
+function useJoinGame() {
   const [errorMessage, setErrorMessage] = useState("");
 
   const joinGame = async (selectedGameId) => {
@@ -33,7 +33,7 @@ const useJoinGame = () => {
         {
           game_id: selectedGameId,
           player_id: user.id,
-          status: 0, // Player is currently playing
+          status: 0,
           userName: user.email,
         },
       ]);
@@ -48,6 +48,6 @@ const useJoinGame = () => {
   };
 
   return { joinGame, errorMessage };
-};
+}
 
 export default useJoinGame;
