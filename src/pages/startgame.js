@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import supabase from "../supabaseClient";
-import useJoinGame from "../hooks/useJoinGame";
+import joinGame from "../utils/joinGame";
 import "../styles/startgame.css";
 
 function StartGame() {
@@ -9,7 +9,6 @@ function StartGame() {
   const [customTopic, setCustomTopic] = useState("");
   const [message, setMessage] = useState("");
 
-  const { joinGame, errorMessage } = useJoinGame();
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -30,11 +29,11 @@ function StartGame() {
       ])
       .select()
       .single();
-      console.log("game: ", game);
-      if (insertError) {
-        setMessage("Failed to create game: " + insertError.message);
-        return;
-      }
+    console.log("game: ", game);
+    if (insertError) {
+      setMessage("Failed to create game: " + insertError.message);
+      return;
+    }
     await joinGame(game.id);
     window.location.href = `/game`;
   }
@@ -87,7 +86,6 @@ function StartGame() {
       </form>
 
       {message && <p>{message}</p>}
-      {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
     </div>
   );
 }

@@ -1,34 +1,27 @@
 import React, { useState, useEffect } from "react";
 import supabase from "../supabaseClient";
-import useJoinGame from "../hooks/useJoinGame";
+import joinGame from "../utils/joinGame";
 import "../styles/joingame.css";
 
 function JoinGame() {
   const [games, setGames] = useState([]);
-  const [errorMessage, setErrorMessage] = useState("");
-  const { joinGame, errorMessage: joinErrorMessage } = useJoinGame();
 
-  const fetchGames = async () => {
-    try {
-      const { data: gamesList, error } = await supabase
-        .from("games")
-        .select("*")
-        .eq("state", "waiting");
-
-      if (error) {
-        throw new Error("Failed to fetch game servers.");
-      }
-
-      setGames(gamesList);
-    } catch (error) {
-      console.error("Error:", error);
-      setErrorMessage("An error occurred while fetching the game servers.");
-    }
-  };
+  async function fetchGames() {
+    const { data: selectGames, error: selectGamesError } = await supabase
+      .from("games")
+      .select("*")
+      .eq("state", "waiting");
+    console.log("selectGames: ", selectGames);
+    console.log("selectGamesError: ", selectGamesError);
+    setGames(selectGames);
+  }
 
   useEffect(() => {
     fetchGames();
+  }, []);
 
+  //subscribes me to games changes
+  useEffect(() => {
     const subscription = supabase
       .channel("games")
       .on(
@@ -42,15 +35,14 @@ function JoinGame() {
       .subscribe((status) => {
         console.log("Subscription status:", status);
       });
-
     return () => {
       subscription.unsubscribe();
     };
   }, []);
 
-  const handleJoinGame = async (gameId) => {
+  async function handleJoinGame (gameId){
     await joinGame(gameId);
-    window.location.href = `/game`; // Redirect to the gaming page after joining
+    window.location.href = `/game`;
   };
 
   return (
@@ -59,9 +51,6 @@ function JoinGame() {
         <img src="/F1RacerLogo.png" alt="F1 Racer Logo" />
         <h2>Join a Race</h2>
       </div>
-      {(errorMessage || joinErrorMessage) && (
-        <p className="error-message">{errorMessage || joinErrorMessage}</p>
-      )}
       <span id="gameServerNote">
         {games.length === 0
           ? "No games yet!"

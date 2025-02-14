@@ -55,10 +55,10 @@ function Game() {
   }, []);
 
   useEffect(() => {
-    if (!gameId) return; // Do not proceed if gameId is not set
+    if (!gameId) return;
 
-    // Set up a Supabase channel specific to the game
     const channel = supabase.channel(`game-${gameId}`);
+    console.log("channel", channel);
 
     // Listen for incoming messages
     channel
