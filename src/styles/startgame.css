@@ -1,21 +1,4 @@
-body {
-    font: 100% Lucida Sans, Verdana;
-    margin: 0;
-    padding: 0;
-    /* background: url("racetrack-background.jpg") no-repeat center center fixed; */
-    background-size: cover;
-    line-height: 1.6;
-  }
-  
-  .container {
-    max-width: 600px;
-    margin: 50px auto;
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.8);
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  }
-  
+
   .header {
     display: flex;
     align-items: center;

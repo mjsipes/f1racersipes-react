@@ -5,7 +5,6 @@ body {
     font: 100% Lucida Sans, Verdana;
     margin: 0;
     padding: 0;
-    background-color: aqua;
     line-height: 1.6;
     text-align: center;
   }
@@ -13,13 +12,22 @@ body {
   /* Container Styles */
   .container {
     background: #fff;
-    max-width: 400px;
+    max-width: 600px;
     margin: 50px auto;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     position: relative;
     overflow: auto;
+  }
+
+
+  .racetrack-image {
+    display: block;
+    width: 100%;
+    max-width: 600px;
+    margin: 20px auto;
+    border-radius: 8px;
   }
   
   /* Header and Logo */
