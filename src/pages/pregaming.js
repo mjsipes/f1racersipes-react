@@ -1,7 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import "../styles/global.css";
 import supabase from "../supabaseClient";
+import { redirectTo } from "../utils/redirectTo";
 
 function Pregaming() {
   const [user, setUser] = useState(null);
@@ -11,7 +11,10 @@ function Pregaming() {
     const { data: authData, error: authError } = await supabase.auth.getUser();
     setUser(authData.user);
     console.log("authData: ", authData);
-    console.log("authError: ", authError);
+    if (authError){
+      console.log("authError: ", authError);
+      alert(authError);
+    }
   }
 
   async function getUserProfile(user) {
@@ -22,7 +25,10 @@ function Pregaming() {
       .single();
     setUserProfile(profile);
     console.log("profile: ", profile);
-    console.log("profileError: ", profileError);
+    if (profileError){
+      console.log("profileError: ", profileError);
+      alert(profileError);
+    }
   }
 
   useEffect(() => {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import supabase from "../supabaseClient";
-import "../styles/game.css";
+
 
 /**
  * @typedef {Object} Player
@@ -387,7 +387,7 @@ function Game() {
         </h2>
       </div>
 
-      <h1 className="game-stats">
+      <p>
         Game Statistics:{" "}
         <span id="numCharactersTyped">{numCharactersTyped}</span> characters
         typed.
@@ -395,7 +395,7 @@ function Game() {
         <span id="isError">{isError.toString()}</span> = isError.
         <span id="timer">{timeElapsed}</span> seconds.{" "}
         <span id="percentComplete">{percentComplete}</span>% complete.
-      </h1>
+      </p>
 
       <span id="carPosition"></span>
 

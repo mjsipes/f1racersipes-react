@@ -1,39 +1,26 @@
 import React, { useState } from "react";
 import supabase from "../supabaseClient";
-import "../styles/global.css";
-
-// Reusable Button Component
-const Button = ({ className, onClick, children }) => (
-  <button className={className} onClick={onClick}>
-    {children}
-  </button>
-);
-
-// Reusable Modal Component
-const Modal = ({ onClose, onContinue }) => (
-  <div id="guestModal" className="modal">
-    <div className="modal-content">
-      <p>When you play as a guest, your information will not be saved.</p>
-      <Button className="modal-button" onClick={onClose}>
-        Go Back
-      </Button>
-      <Button className="modal-button" onClick={onContinue}>
-        Continue
-      </Button>
-    </div>
-  </div>
-);
+import { redirectTo } from "../utils/redirectTo";
 
 function Initial() {
-  const [showModal, setShowModal] = useState(false);
+  console.log(window.performance);
+  console.log(window.localStorage);
 
-  const handlePlayAsGuest = (event) => {
+  const handlePlayAsGuest = async (event) => {
     event.preventDefault();
-    setShowModal(true);
-  };
+    const isConfirmed = window.confirm(
+      "When you play as a guest, your information will not be saved. Do you want to continue?"
+    );
 
-  const redirectTo = (path) => {
-    window.location.href = path;
+    if (isConfirmed) {
+      const { data: signInData, error: signInError } =
+        await supabase.auth.signInAnonymously();
+      const { data: updateData, error: updateError } =
+        await supabase.auth.updateUser({
+          data: { userName: "guest", full_name: "guest" },
+        });
+      redirectTo("/pregaming");
+    }
   };
 
   return (
@@ -45,36 +32,16 @@ function Initial() {
         or against the clock. Will you cross the finish line first?
       </p>
       <div className="button-group">
-        <Button className="button" onClick={() => redirectTo("/login")}>
+        <button className="button" onClick={() => redirectTo("/login")}>
           Log In
-        </Button>
-        <Button className="button" onClick={() => redirectTo("/signup")}>
+        </button>
+        <button className="button" onClick={() => redirectTo("/signup")}>
           Register
-        </Button>
-        <Button
-          className="button button-play-guest"
-          onClick={handlePlayAsGuest}
-        >
+        </button>
+        <button className="button" onClick={handlePlayAsGuest}>
           Play as Guest
-        </Button>
+        </button>
       </div>
-
-      {showModal && (
-        <Modal
-          onClose={() => setShowModal(false)}
-          onContinue={async () => {
-            {
-              const { data, error } = await supabase.auth.signInAnonymously();
-            }
-            {
-              const { data, error } = await supabase.auth.updateUser({
-                data: { userName: "guest", full_name: "guest" },
-              });
-            }
-            redirectTo("/pregaming");
-          }}
-        />
-      )}
     </div>
   );
 }

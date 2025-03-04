@@ -6,20 +6,6 @@
     margin-bottom: 20px;
   }
   
-  .header img {
-    height: 50px;
-    margin-right: 20px;
-  }
-  
-  h2 {
-    color: #e74c3c;
-    margin: 0;
-  }
-  
-  label {
-    display: block;
-    margin: 10px 0;
-  }
   
   input[type="text"] {
     width: calc(100% - 22px);
@@ -70,9 +56,3 @@
   tr:hover {
     background-color: #ddd;
   }
-  
-  .error-message {
-    color: red;
-    margin-top: 10px;
-  }
-  
