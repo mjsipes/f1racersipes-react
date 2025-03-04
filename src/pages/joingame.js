@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import supabase from "../supabaseClient";
 import joinGame from "../utils/joinGame";
-import "../styles/joingame.css";
 
 function JoinGame() {
   const [games, setGames] = useState([]);

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import supabase from "../supabaseClient";
 import joinGame from "../utils/joinGame";
-import "../styles/startgame.css";
 
 function StartGame() {
   const [gameServerName, setGameServerName] = useState("");

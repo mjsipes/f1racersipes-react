@@ -1,7 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import supabase from "../supabaseClient";
-import { redirectTo } from "../utils/redirectTo";
 
 function Pregaming() {
   const [user, setUser] = useState(null);
