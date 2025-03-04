@@ -40,7 +40,7 @@ function Signup() {
   return (
     <div>
       <div className="container">
-        <h2>Register for F1 Racer</h2>
+        <h2 style={{ marginBottom: "20px" }}>Register for F1 Racer</h2>
         <form id="registerForm" onSubmit={handleSubmit}>
           <label htmlFor="email">Email</label>
           <input

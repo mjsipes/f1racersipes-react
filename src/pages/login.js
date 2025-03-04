@@ -6,7 +6,6 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -32,7 +31,8 @@ function Login() {
   return (
     <div>
       <div className="container">
-        <h2>Log In to F1 Racer</h2>
+        <h2 style={{ marginBottom: "20px" }}>Log In to F1 Racer</h2>
+
         <form id="loginForm" onSubmit={handleSubmit}>
           <label htmlFor="email">Email</label>
           <input

@@ -47,7 +47,7 @@ function JoinGame() {
   return (
     <div className="container">
       <div className="header">
-        <img src="/F1RacerLogo.png" alt="this is the logo" className="f1racerlogo"/>
+        <img src="/F1RacerLogo.png" alt="this is the logo" className="f1racerlogosmall"/>
         <h2>Join a Race</h2>
       </div>
       <span id="gameServerNote">

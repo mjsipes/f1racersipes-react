@@ -8,7 +8,6 @@ function StartGame() {
   const [customTopic, setCustomTopic] = useState("");
   const [message, setMessage] = useState("");
 
-
   async function handleSubmit(event) {
     event.preventDefault();
     const { data: user } = await supabase.auth.getUser();
@@ -40,7 +39,11 @@ function StartGame() {
   return (
     <div className="container">
       <div className="header">
-      <img src="F1RacerLogo.png" alt="this is the logo" className="f1racerlogo" />
+        <img
+          src="F1RacerLogo.png"
+          alt="this is the logo"
+          className="f1racerlogosmall"
+        />
         <h2>Set Up Your Race</h2>
       </div>
       <form id="startGameForm" onSubmit={handleSubmit}>
@@ -78,10 +81,9 @@ function StartGame() {
           value={customTopic}
           onChange={(e) => setCustomTopic(e.target.value)}
         />
-
-        <button type="submit" className="button">
-          Start Game
-        </button>
+          <button type="submit" className="button">
+            Start Game
+          </button>
       </form>
 
       {message && <p>{message}</p>}

@@ -374,7 +374,7 @@ function Game() {
   return (
     <div className="container">
       <div className="header">
-        <img src="/F1RacerLogo.png" alt="logo" className="f1racerlogo"/>
+        <img src="/F1RacerLogo.png" alt="logo" className="f1racerlogosmall"/>
         <h2>
           F1Racer,{" "}
           <span>

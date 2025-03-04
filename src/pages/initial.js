@@ -31,7 +31,8 @@ function Initial() {
         Experience the thrill of racing and typing as you compete against others
         or against the clock. Will you cross the finish line first?
       </p>
-      <div className="button-group">
+
+      <div className="buttons">
         <button className="button" onClick={() => redirectTo("/login")}>
           Log In
         </button>
@@ -42,6 +43,7 @@ function Initial() {
           Play as Guest
         </button>
       </div>
+      
     </div>
   );
 }

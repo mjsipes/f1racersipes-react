@@ -10,7 +10,7 @@ function Pregaming() {
     const { data: authData, error: authError } = await supabase.auth.getUser();
     setUser(authData.user);
     console.log("authData: ", authData);
-    if (authError){
+    if (authError) {
       console.log("authError: ", authError);
       alert(authError);
     }
@@ -24,7 +24,7 @@ function Pregaming() {
       .single();
     setUserProfile(profile);
     console.log("profile: ", profile);
-    if (profileError){
+    if (profileError) {
       console.log("profileError: ", profileError);
       alert(profileError);
     }
@@ -43,7 +43,11 @@ function Pregaming() {
   return (
     <div className="container">
       <header className="header">
-        <img src="F1RacerLogo.png" alt="this is the logo" className="f1racerlogo" />
+        <img
+          src="F1RacerLogo.png"
+          alt="this is the logo"
+          className="f1racerlogosmall"
+        />
         <h2>
           {"Prepare to race "}
           {user?.user_metadata?.userName && (
@@ -62,15 +66,25 @@ function Pregaming() {
         </section>
       )}
 
-      <img src="/Racetrack.png" alt="this is the racetrack" className="racetrack-image" />
+      <img
+        src="/Racetrack.png"
+        alt="this is the racetrack"
+        className="racetrack-image"
+      />
 
-      <div className="button-group">
-        <a href="/startgame" className="button">
+      <div className="buttons">
+        <button
+          className="button"
+          onClick={() => (window.location.href = "/startgame")}
+        >
           Start Game
-        </a>
-        <a href="/joingame" className="button">
+        </button>
+        <button
+          className="button"
+          onClick={() => (window.location.href = "/joingame")}
+        >
           Join Game
-        </a>
+        </button>
       </div>
     </div>
   );
