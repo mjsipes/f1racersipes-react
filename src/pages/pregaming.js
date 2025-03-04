@@ -43,9 +43,9 @@ function Pregaming() {
   return (
     <div className="container">
       <header className="header">
-        <img src="F1RacerLogo.png" alt="F1 Racer Logo" className="logo1" />
+        <img src="F1RacerLogo.png" alt="this is the logo" className="f1racerlogo" />
         <h2>
-          Prepare to race{" "}
+          {"Prepare to race "}
           {user?.user_metadata?.userName && (
             <span>{user.user_metadata.userName}</span>
           )}
@@ -62,7 +62,7 @@ function Pregaming() {
         </section>
       )}
 
-      <img src="/Racetrack.png" alt="Racetrack" className="racetrack-image" />
+      <img src="/Racetrack.png" alt="this is the racetrack" className="racetrack-image" />
 
       <div className="button-group">
         <a href="/startgame" className="button">

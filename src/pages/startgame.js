@@ -40,7 +40,7 @@ function StartGame() {
   return (
     <div className="container">
       <div className="header">
-        <img src="/F1RacerLogo.png" alt="F1 Racer Logo" />
+      <img src="F1RacerLogo.png" alt="this is the logo" className="f1racerlogo" />
         <h2>Set Up Your Race</h2>
       </div>
       <form id="startGameForm" onSubmit={handleSubmit}>

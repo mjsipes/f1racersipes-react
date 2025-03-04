@@ -26,7 +26,7 @@ function Initial() {
   return (
     <div className="container">
       <h2>Welcome to F1 Racer</h2>
-      <img src="/F1RacerLogo.png" alt="F1 Racer Logo" className="logo" />
+      <img src="/F1RacerLogo.png" alt="logo" className="f1racerlogobig" />
       <p>
         Experience the thrill of racing and typing as you compete against others
         or against the clock. Will you cross the finish line first?
