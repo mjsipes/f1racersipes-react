@@ -104,7 +104,6 @@ h2 {
 }
 
 
-
 /* Table Styles */
 table {
   width: 100%;
@@ -128,8 +127,10 @@ tr:nth-child(even) {
 }
 
 tr:hover {
+  transition: background-color 0.3s ease;
   background-color: #ddd;
 }
+
 
 /* Input and Label Styles */
 label {
