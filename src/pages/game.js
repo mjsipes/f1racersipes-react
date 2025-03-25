@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import supabase from "../supabaseClient";
 
-
 /**
  * @typedef {Object} Player
  * @property {string} playerId
@@ -372,10 +371,10 @@ function Game() {
   //
 
   return (
-    <div className="container">
-      <div className="header">
-        <img src="/F1RacerLogo.png" alt="logo" className="f1racerlogosmall"/>
-        <h2>
+    <>
+      <div className="gameheader">
+        <img src="/F1RacerLogo.png" alt="logo" className="f1racerlogosmall" />
+        <h2 className="headerwelcomemessage">
           F1Racer,{" "}
           <span>
             {user?.user_metadata?.email ? user.user_metadata.email : "Guest"}
@@ -386,85 +385,126 @@ function Game() {
           <span id="endOfGameMessage"></span>
         </h2>
       </div>
+      <div className="container">
+        
+        <div className="game-stats-card">
+          {/* Header with Timer */}
+          <div className="stats-header">
+            <div className="stats-title">GAME STATS</div>
+            <div className="timer-badge">{timeElapsed}s</div>
+          </div>
 
-      <p>
-        Game Statistics:{" "}
-        <span id="numCharactersTyped">{numCharactersTyped}</span> characters
-        typed.
-        <span id="CPM">{CPM}</span> CPM.{" "}
-        <span id="isError">{isError.toString()}</span> = isError.
-        <span id="timer">{timeElapsed}</span> seconds.{" "}
-        <span id="percentComplete">{percentComplete}</span>% complete.
-      </p>
+          {/* Main stats section */}
+          <div className="stats-main">
+            {/* Left column */}
+            <div className="stats-column">
+              <div className="stats-label">CPM</div>
+              <div className="stats-value">{CPM}</div>
+            </div>
 
-      <span id="carPosition"></span>
+            {/* Divider */}
+            <div className="vertical-divider"></div>
 
-      <span id="playerPositionTable">
-        {players.length > 0 && (
-          <table>
-            <thead>
-              <tr>
-                {/* Filter out "playerId" from keys */}
-                {Object.keys(players[0])
-                  .filter((key) => key !== "playerId")
-                  .map((key) => (
-                    <th key={key}>{key}</th>
-                  ))}
-              </tr>
-            </thead>
-            <tbody>
-              {players.map((player) => (
-                <tr key={player.id} style={{ cursor: "pointer" }}>
-                  {/* Filter out "playerId" from values */}
-                  {Object.entries(player)
-                    .filter(([key]) => key !== "playerId")
-                    .map(([key, value], index) => (
-                      <td key={index}>{value}</td>
+            {/* Right column */}
+            <div className="stats-column">
+              <div className="stats-label">Characters</div>
+              <div className="stats-value">{numCharactersTyped}</div>
+            </div>
+          </div>
+
+          {/* Progress section */}
+          <div className="stats-progress">
+            {/* Accuracy */}
+            <div className="stats-column">
+              <div className="stats-label">Accuracy</div>
+              <div className="stats-value">{percentComplete}%</div>
+            </div>
+
+            {/* Progress bar */}
+            <div className="progress-container">
+              <div className="stats-label">Progress</div>
+              <div className="progress-bar-bg">
+                <div
+                  className="progress-bar-fill"
+                  style={{ width: `${percentComplete}%` }}
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Error status */}
+          {isError && <div className="error-message">Error detected!</div>}
+        </div>
+
+        <span id="carPosition"></span>
+
+        <span id="playerPositionTable">
+          {players.length > 0 && (
+            <table>
+              <thead>
+                <tr>
+                  {/* Filter out "playerId" from keys */}
+                  {Object.keys(players[0])
+                    .filter((key) => key !== "playerId")
+                    .map((key) => (
+                      <th key={key}>{key}</th>
                     ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </span>
+              </thead>
+              <tbody>
+                {players.map((player) => (
+                  <tr key={player.id} style={{ cursor: "pointer" }}>
+                    {/* Filter out "playerId" from values */}
+                    {Object.entries(player)
+                      .filter(([key]) => key !== "playerId")
+                      .map(([key, value], index) => (
+                        <td key={index}>{value}</td>
+                      ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </span>
 
-      <p>
-        Prompt: <span id="prompt">{prompt}</span>
-      </p>
+        <p>
+          Prompt: <span id="prompt">{prompt}</span>
+        </p>
 
-      <br />
-      <input
-        type="text"
-        id="typingInput"
-        placeholder="Start typing..."
-        ref={typingInputRef}
-        onInput={handleTypingInput}
-      />
-      <br />
-      <div id="response">{response}</div>
-
-      <a href="/pregaming" className="button">
-        Exit Game
-      </a>
-      <div>
-        <h2>Simple Chat</h2>
-        <div className="chat-box">
-          {messages.map((msg, index) => (
-            <div key={index} className="message">
-              <span>{msg.payload.timestamp}: </span>
-              {msg.payload.content}
-            </div>
-          ))}
-        </div>
+        <br />
         <input
           type="text"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Type your message..."
+          id="typingInput"
+          placeholder="Start typing..."
+          ref={typingInputRef}
+          onInput={handleTypingInput}
         />
-        <button onClick={sendMessage}>Send</button>
+        <br />
+        <div id="response">{response}</div>
+
+        <a href="/pregaming" className="button">
+          Exit Game
+        </a>
+        <div>
+          <h2>Simple Chat</h2>
+          <div className="chat-box">
+            {messages.map((msg, index) => (
+              <div key={index} className="message">
+                <span>{msg.payload.timestamp}: </span>
+                {msg.payload.content}
+              </div>
+            ))}
+          </div>
+          <input
+            type="text"
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder="Type your message..."
+          />
+          <button onClick={sendMessage}>Send</button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
