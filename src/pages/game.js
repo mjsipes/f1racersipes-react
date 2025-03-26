@@ -360,6 +360,50 @@ function Game() {
       // send("isWinner", true);
     }
   };
+
+  // Render the prompt with colored characters
+  const renderPrompt = () => {
+    // Find the index where the error starts (if any)
+    let errorIndex = -1;
+    for (let i = 0; i < response.length; i++) {
+      if (response[i] !== prompt[i]) {
+        errorIndex = i;
+        break;
+      }
+    }
+
+    // If there's no error, but the response is longer than the prompt
+    if (errorIndex === -1 && response.length > prompt.length) {
+      errorIndex = prompt.length;
+    }
+
+    // If there's no error at all
+    if (errorIndex === -1) {
+      // Split the prompt into completed (green) and remaining parts
+      const completedPart = prompt.substring(0, response.length);
+      const remainingPart = prompt.substring(response.length);
+
+      return (
+        <span id="prompt">
+          <span style={{ color: "#4CAF50" }}>{completedPart}</span>
+          {remainingPart}
+        </span>
+      );
+    } else {
+      // There's an error: split into correct, incorrect, and remaining parts
+      const correctPart = prompt.substring(0, errorIndex);
+      const incorrectPart = response.substring(errorIndex);
+      const remainingPart = prompt.substring(errorIndex);
+
+      return (
+        <span id="prompt">
+          <span style={{ color: "#4CAF50" }}>{correctPart}</span>
+          <span style={{ color: "#FF0000" }}>{incorrectPart}</span>
+          {remainingPart}
+        </span>
+      );
+    }
+  };
   //
 
   //
@@ -386,7 +430,6 @@ function Game() {
         </h2>
       </div>
       <div className="container">
-        
         <div className="game-stats-card">
           {/* Header with Timer */}
           <div className="stats-header">
@@ -436,8 +479,6 @@ function Game() {
           {isError && <div className="error-message">Error detected!</div>}
         </div>
 
-        <span id="carPosition"></span>
-
         <span id="playerPositionTable">
           {players.length > 0 && (
             <table>
@@ -467,9 +508,7 @@ function Game() {
           )}
         </span>
 
-        <p>
-          Prompt: <span id="prompt">{prompt}</span>
-        </p>
+        <div className="prompt">Prompt: {renderPrompt()}</div>
 
         <br />
         <input
@@ -480,7 +519,7 @@ function Game() {
           onInput={handleTypingInput}
         />
         <br />
-        <div id="response">{response}</div>
+        {/* <div id="response">{response}</div> */}
 
         <a href="/pregaming" className="button">
           Exit Game
