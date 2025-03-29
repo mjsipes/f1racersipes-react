@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import supabase from "../supabaseClient";
 
 const ChatCard = ({ gameId }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
     if (!gameId) return;
@@ -18,6 +19,11 @@ const ChatCard = ({ gameId }) => {
       channel.unsubscribe();
     };
   }, [gameId]);
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   const sendMessage = async () => {
     if (newMessage.trim() !== "" && gameId) {
@@ -38,22 +44,6 @@ const ChatCard = ({ gameId }) => {
       <div className="chat-header">
         <div className="chat-title">CHAT</div>
       </div>
-      <br></br>
-      <input
-        type="text"
-        value={newMessage}
-        onChange={(e) => setNewMessage(e.target.value)}
-        onKeyPress={(e) => {
-          if (e.key === 'Enter') {
-            sendMessage();
-            e.preventDefault();
-          }
-        }}
-        placeholder="Type your message..."
-      />
-      <button className="button" onClick={sendMessage}>
-        Send
-      </button>
       <div className="chat-box">
         {messages.map((msg, index) => (
           <div key={index} className="message">
@@ -61,6 +51,25 @@ const ChatCard = ({ gameId }) => {
             {msg.payload.content}
           </div>
         ))}
+        <div ref={messagesEndRef} />
+      </div>
+      <div className="chat-input-area">
+        <input
+          type="text"
+          className="chat-input"
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+          onKeyPress={(e) => {
+            if (e.key === 'Enter') {
+              sendMessage();
+              e.preventDefault();
+            }
+          }}
+          placeholder="Type your message..."
+        />
+        <button className="chat-send-button" onClick={sendMessage}>
+          Send
+        </button>
       </div>
     </div>
   );

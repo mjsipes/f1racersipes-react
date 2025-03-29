@@ -319,14 +319,15 @@ input:not([type="range"]) {
   margin: 20px 0px 20px 0px;
 }
 
-
 .chat-card {
   border: 2px solid #e74c3c;
   width: 280px;
+  height: 280px;
   text-align: center;
   padding: 12px;
   margin: 20px auto;
-  /* flex: 2 2 150px; */
+  display: flex;
+  flex-direction: column;
 }
 
 .chat-header {
@@ -341,4 +342,44 @@ input:not([type="range"]) {
 .chat-title {
   font-weight: bold;
   font-size: 18px;
+}
+
+.chat-box {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 12px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.message {
+  padding: 4px 0;
+}
+
+.chat-input-area {
+  display: flex;
+  gap: 8px;
+}
+
+.chat-input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 0px !important;
+}
+
+.chat-send-button {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.chat-send-button:hover {
+  background-color: #c0392b;
 }
