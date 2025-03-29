@@ -14,3 +14,13 @@ research how to do a timer.
 
 add chat feature to each game.
 and how to do a countdown??
+
+stripe has a beutiful website
+
+https://thebluedesert.com/
+
+explore my own creativity on game page verusus next js.
+
+
+Testing Implementation: Add proper testing to showcase software engineering practices
+CI/CD Pipeline: Set up automated deployment

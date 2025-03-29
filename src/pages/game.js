@@ -1,4 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
+import { redirectTo } from "../utils/redirectTo";
+import ChatCard from '../components/ChatCard';
+
 import supabase from "../supabaseClient";
 
 /**
@@ -13,7 +16,7 @@ function Game() {
   const [gameId, setGameId] = useState(null);
   const [gameName, setGameName] = useState("");
   const [prompt, setPrompt] = useState(
-    "Dolphins are smart sea animals. They eat fish and squid."
+    "Dolphins are smart sea animals. They eat fish and squid. Dolphins are smart sea animals. They eat fish and squid."
   );
   /**
    * @type {Player[]}
@@ -39,9 +42,6 @@ function Game() {
 
   const typingInputRef = useRef(null);
 
-  const [messages, setMessages] = useState([]); // List of messages
-  const [newMessage, setNewMessage] = useState(""); // Message input
-
   async function getUser() {
     const { data: authData, error: authError } = await supabase.auth.getUser();
     setUser(authData.user);
@@ -52,40 +52,6 @@ function Game() {
   useEffect(() => {
     getUser();
   }, []);
-
-  useEffect(() => {
-    if (!gameId) return;
-
-    const channel = supabase.channel(`game-${gameId}`);
-    console.log("channel", channel);
-
-    // Listen for incoming messages
-    channel
-      .on("broadcast", { event: "new-message" }, (payload) => {
-        setMessages((prevMessages) => [...prevMessages, payload]);
-      })
-      .subscribe();
-
-    // Cleanup on component unmount
-    return () => {
-      channel.unsubscribe();
-    };
-  }, [gameId]); // Re-run this effect if gameId changes
-
-  const sendMessage = async () => {
-    if (newMessage.trim() !== "" && gameId) {
-      // Broadcast the message to other clients in the game-specific channel
-      await supabase.channel(`game-${gameId}`).send({
-        type: "broadcast",
-        event: "new-message",
-        payload: {
-          content: newMessage,
-          timestamp: new Date().toLocaleTimeString(),
-        },
-      });
-      setNewMessage(""); // Clear the input field
-    }
-  };
 
   const fetchGameDetails = async (user, setGameId, setGameName) => {
     if (!user) {
@@ -416,131 +382,102 @@ function Game() {
 
   return (
     <>
-      <div className="gameheader">
-        <img src="/F1RacerLogo.png" alt="logo" className="f1racerlogosmall" />
-        <h2 className="headerwelcomemessage">
-          F1Racer,{" "}
-          <span>
-            {user?.user_metadata?.email ? user.user_metadata.email : "Guest"}
-          </span>
-          , playing in
-          {gameName}
-          <span id="gameServerName"></span>
-          <span id="endOfGameMessage"></span>
-        </h2>
-      </div>
-      <div className="container">
-        <div className="game-stats-card">
-          {/* Header with Timer */}
-          <div className="stats-header">
-            <div className="stats-title">GAME STATS</div>
-            <div className="timer-badge">{timeElapsed}s</div>
-          </div>
-
-          {/* Main stats section */}
-          <div className="stats-main">
-            {/* Left column */}
-            <div className="stats-column">
-              <div className="stats-label">CPM</div>
-              <div className="stats-value">{CPM}</div>
-            </div>
-
-            {/* Divider */}
-            <div className="vertical-divider"></div>
-
-            {/* Right column */}
-            <div className="stats-column">
-              <div className="stats-label">Characters</div>
-              <div className="stats-value">{numCharactersTyped}</div>
-            </div>
-          </div>
-
-          {/* Progress section */}
-          <div className="stats-progress">
-            {/* Accuracy */}
-            <div className="stats-column">
-              <div className="stats-label">Accuracy</div>
-              <div className="stats-value">{percentComplete}%</div>
-            </div>
-
-            {/* Progress bar */}
-            <div className="progress-container">
-              <div className="stats-label">Progress</div>
-              <div className="progress-bar-bg">
-                <div
-                  className="progress-bar-fill"
-                  style={{ width: `${percentComplete}%` }}
-                ></div>
-              </div>
-            </div>
-          </div>
-
-          {/* Error status */}
-          {isError && <div className="error-message">Error detected!</div>}
+      <div style={{display:"flex"}}>
+        <div className="secondary-container">
+          <ChatCard gameId={gameId} />
         </div>
-
-        <span id="playerPositionTable">
-          {players.length > 0 && (
-            <table>
-              <thead>
-                <tr>
-                  {/* Filter out "playerId" from keys */}
-                  {Object.keys(players[0])
-                    .filter((key) => key !== "playerId")
-                    .map((key) => (
-                      <th key={key}>{key}</th>
-                    ))}
-                </tr>
-              </thead>
-              <tbody>
-                {players.map((player) => (
-                  <tr key={player.id} style={{ cursor: "pointer" }}>
-                    {/* Filter out "playerId" from values */}
-                    {Object.entries(player)
-                      .filter(([key]) => key !== "playerId")
-                      .map(([key, value], index) => (
-                        <td key={index}>{value}</td>
+        <div className="game-container">
+          <div className="header">
+            <img
+              src="/F1RacerLogo.png"
+              alt="logo"
+              className="f1racerlogosmall"
+            />
+            <h2 className="headerwelcomemessage">
+              F1Racer,{" "}
+              <span>
+                {user?.user_metadata?.email
+                  ? user.user_metadata.email
+                  : "Guest"}
+              </span>
+              , playing in
+              {gameName}
+            </h2>
+          </div>
+          <span id="playerPositionTable">
+            {players.length > 0 && (
+              <table>
+                <thead>
+                  <tr>
+                    {Object.keys(players[0])
+                      .filter((key) => key !== "playerId")
+                      .map((key) => (
+                        <th key={key}>{key}</th>
                       ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </span>
-
-        <div className="prompt">Prompt: {renderPrompt()}</div>
-
-        <br />
-        <input
-          type="text"
-          id="typingInput"
-          placeholder="Start typing..."
-          ref={typingInputRef}
-          onInput={handleTypingInput}
-        />
-        <br />
-        {/* <div id="response">{response}</div> */}
-
-        <a href="/pregaming" className="button">
-          Exit Game
-        </a>
-        <div>
-          <h2>Simple Chat</h2>
-          <div className="chat-box">
-            {messages.map((msg, index) => (
-              <div key={index} className="message">
-                <span>{msg.payload.timestamp}: </span>
-                {msg.payload.content}
-              </div>
-            ))}
-          </div>
+                </thead>
+                <tbody>
+                  {players.map((player) => (
+                    <tr key={player.id} style={{ cursor: "pointer" }}>
+                      {Object.entries(player)
+                        .filter(([key]) => key !== "playerId")
+                        .map(([key, value], index) => (
+                          <td key={index}>{value}</td>
+                        ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </span>
+          <div className="prompt">Prompt: {renderPrompt()}</div>
+          <br />
           <input
             type="text"
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Type your message..."
+            id="typingInput"
+            placeholder="Start typing..."
+            ref={typingInputRef}
+            onInput={handleTypingInput}
           />
-          <button onClick={sendMessage}>Send</button>
+          <br />
+          <button className="button" onClick={() => redirectTo("/pregaming")}>
+            Exit Game
+          </button>
+        </div>
+        <div className="secondary-container">
+          <div className="game-stats-card">
+            <div className="stats-header">
+              <div className="stats-title">GAME STATS</div>
+              <div className="timer-badge">{timeElapsed}s</div>
+            </div>
+            <div className="stats-main">
+              <div className="stats-column">
+                <div className="stats-label">CPM</div>
+                <div className="stats-value">{CPM}</div>
+              </div>
+              <div className="vertical-divider"></div>
+              <div className="stats-column">
+                <div className="stats-label">Characters</div>
+                <div className="stats-value">{numCharactersTyped}</div>
+              </div>
+            </div>
+            <div className="stats-progress">
+              <div className="stats-column">
+                <div className="stats-label">Accuracy</div>
+                <div className="stats-value">{percentComplete}%</div>
+              </div>
+              <div className="progress-container">
+                <div className="stats-label">Progress</div>
+                <div className="progress-bar-bg">
+                  <div
+                    className="progress-bar-fill"
+                    style={{ width: `${percentComplete}%` }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+            {isError && <div className="error-message">Error detected!</div>}
+          </div>
         </div>
       </div>
     </>

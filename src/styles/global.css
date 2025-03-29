@@ -45,8 +45,8 @@ h2 {
   background: #fff;
   padding: 20px;
   border-radius: 8px;
-  /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
 }
+
 
 .header {
   display: flex;
@@ -63,9 +63,6 @@ h2 {
   /* margin-top: 20px; */
   margin: 20px 60px 0px 60px;
   border-radius: 12px;
-}
-.headerwelcomemessage{
-  color: black;
 }
 
 /* Image Styles */
@@ -198,22 +195,43 @@ input:not([type="range"]) {
   cursor: pointer;
 }
 
-/*game-stats-card styles*/
+/*game page styles */
+
+.game-container {
+  margin-top: 50px;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  width: 600px;
+}
+
+.secondary-container {
+  margin-top: 50px;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  max-width: 600px;
+  flex-shrink: 1;
+}
+
+
+
 .game-stats-card {
-  border: 2px solid #ff6600;
+  border: 2px solid #e74c3c;
   width: 280px;
   text-align: center;
-  border-radius: 8px;
   padding: 12px;
   margin: 20px auto;
-  background-color: #fff8f2;
 }
 
 .stats-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #ff6600;
+  border-bottom: 2px solid #e74c3c;
   margin-bottom: 12px;
   padding-bottom: 8px;
 }
@@ -224,7 +242,7 @@ input:not([type="range"]) {
 }
 
 .timer-badge {
-  background-color: #ff6600;
+  background-color: #e74c3c;;
   color: white;
   padding: 3px 8px;
   border-radius: 12px;
@@ -243,13 +261,13 @@ input:not([type="range"]) {
 }
 
 .vertical-divider {
-  border-left: 1px solid #ff6600;
+  border-left: 2px solid #e74c3c;
   height: 50px;
 }
 
 .stats-label {
   font-weight: bold;
-  color: #ff6600;
+  color: #e74c3c;
   font-size: 14px;
 }
 
@@ -259,7 +277,7 @@ input:not([type="range"]) {
 }
 
 .stats-progress {
-  border-top: 1px solid #ff6600;
+  border-top: 2px solid #e74c3c;
   padding-top: 10px;
   display: flex;
   justify-content: space-between;
@@ -299,4 +317,28 @@ input:not([type="range"]) {
   background-color: lightblue;
   padding: 10px 0px 10px 0px;
   margin: 20px 0px 20px 0px;
+}
+
+
+.chat-card {
+  border: 2px solid #e74c3c;
+  width: 280px;
+  text-align: center;
+  padding: 12px;
+  margin: 20px auto;
+  /* flex: 2 2 150px; */
+}
+
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #e74c3c;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+}
+
+.chat-title {
+  font-weight: bold;
+  font-size: 18px;
 }
