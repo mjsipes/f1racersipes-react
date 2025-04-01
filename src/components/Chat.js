@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import supabase from "../supabaseClient";
 
-const ChatCard = ({ gameId }) => {
+const Chat = ({ gameId }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef(null);
@@ -75,4 +75,4 @@ const ChatCard = ({ gameId }) => {
   );
 };
 
-export default ChatCard;
+export default Chat;

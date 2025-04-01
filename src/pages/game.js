@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { redirectTo } from "../utils/redirectTo";
-import ChatCard from '../components/ChatCard';
+import Chat from '../components/Chat';
+import GameStats from '../components/GameStats';
 
 import supabase from "../supabaseClient";
 
@@ -384,7 +385,7 @@ function Game() {
     <>
       <div style={{display:"flex"}}>
         <div className="secondary-container">
-          <ChatCard gameId={gameId} />
+          <Chat gameId={gameId} />
         </div>
         <div className="game-container">
           <div className="game-header">
@@ -445,39 +446,13 @@ function Game() {
           </button>
         </div>
         <div className="secondary-container">
-          <div className="game-stats-card">
-            <div className="stats-header">
-              <div className="stats-title">GAME STATS</div>
-              <div className="timer-badge">{timeElapsed}s</div>
-            </div>
-            <div className="stats-main">
-              <div className="stats-column">
-                <div className="stats-label">CPM</div>
-                <div className="stats-value">{CPM}</div>
-              </div>
-              <div className="vertical-divider"></div>
-              <div className="stats-column">
-                <div className="stats-label">Characters</div>
-                <div className="stats-value">{numCharactersTyped}</div>
-              </div>
-            </div>
-            <div className="stats-progress">
-              <div className="stats-column">
-                <div className="stats-label">Accuracy</div>
-                <div className="stats-value">{percentComplete}%</div>
-              </div>
-              <div className="progress-container">
-                <div className="stats-label">Progress</div>
-                <div className="progress-bar-bg">
-                  <div
-                    className="progress-bar-fill"
-                    style={{ width: `${percentComplete}%` }}
-                  ></div>
-                </div>
-              </div>
-            </div>
-            {isError && <div className="error-message">Error detected!</div>}
-          </div>
+          <GameStats 
+            timeElapsed={timeElapsed}
+            CPM={CPM}
+            numCharactersTyped={numCharactersTyped}
+            percentComplete={percentComplete}
+            isError={isError}
+          />
         </div>
       </div>
     </>
