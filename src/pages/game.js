@@ -387,7 +387,7 @@ function Game() {
           <ChatCard gameId={gameId} />
         </div>
         <div className="game-container">
-          <div className="header">
+          <div className="game-header">
             <img
               src="/F1RacerLogo.png"
               alt="logo"
