@@ -198,8 +198,15 @@ input:not([type="range"]) {
   flex-shrink: 1;
 }
 
+/* prompt  styles */
 
+.prompt {
+  background-color: lightblue;
+  padding: 10px 0px 10px 0px;
+  margin: 20px 0px 20px 0px;
+}
 
+/* stat card styles */
 .game-stats-card {
   border: 2px solid #e74c3c;
   width: 280px;
@@ -292,14 +299,7 @@ input:not([type="range"]) {
   font-weight: bold;
 }
 
-/* prompt  styles */
-
-.prompt {
-  background-color: lightblue;
-  padding: 10px 0px 10px 0px;
-  margin: 20px 0px 20px 0px;
-}
-
+/* chat styles */
 .chat-card {
   border: 2px solid #e74c3c;
   width: 280px;
