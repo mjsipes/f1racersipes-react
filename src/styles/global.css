@@ -1,5 +1,5 @@
 /* Base Styles */
-html{
+html, body{
   height: 100%;
   margin: 0;
   padding: 0;
@@ -179,7 +179,7 @@ input:not([type="range"]) {
 /*game page styles */
 
 .game-container {
-  margin-top: 50px;
+  margin-top: 70px;
   margin-left: auto;
   margin-right: auto;
   display: flex;
