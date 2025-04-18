@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { redirectTo } from "../utils/redirectTo";
-import Chat from '../components/Chat';
-import GameStats from '../components/GameStats';
+import Chat from "../components/Chat";
+import GameStats from "../components/GameStats";
 
 import supabase from "../supabaseClient";
 
@@ -383,7 +383,7 @@ function Game() {
 
   return (
     <>
-      <div style={{display:"flex"}}>
+      <div style={{ display: "flex" }}>
         <div className="secondary-container">
           <Chat gameId={gameId} />
         </div>
@@ -446,7 +446,7 @@ function Game() {
           </button>
         </div>
         <div className="secondary-container">
-          <GameStats 
+          <GameStats
             timeElapsed={timeElapsed}
             CPM={CPM}
             numCharactersTyped={numCharactersTyped}
