@@ -91,30 +91,36 @@ function Game() {
 
   // Fetch Players in a Game
   const fetchPlayers = async (gameId, setPlayers) => {
-    if (!gameId) return;
+    if (!gameId) {
+      console.log("No gameId provided");
+      return;
+    }
 
     console.log("Fetching players...");
-    try {
-      const { data: playersData, error: playersError } = await supabase
-        .from("game_players")
-        .select("*")
-        .eq("game_id", gameId)
-        .order("player_id");
 
-      if (playersError || !playersData) {
-        throw new Error(playersError || "Players data not found.");
-      }
+    const { data: playersData, error: playersError } = await supabase
+      .from("game_players")
+      .select("*")
+      .eq("game_id", gameId)
+      .order("player_id");
 
-      setPlayers(
-        playersData.map((player) => ({
-          playerId: player.player_id,
-          userName: player.userName,
-          status: player.status,
-        }))
-      );
-    } catch (error) {
-      console.error("Error fetching players:", error.message);
+    if (playersError) {
+      console.error("Failed to fetch players:", playersError.message);
+      return;
     }
+
+    if (!playersData) {
+      console.error("Players data not found.");
+      return;
+    }
+
+    setPlayers(
+      playersData.map((player) => ({
+        playerId: player.player_id,
+        userName: player.userName,
+        status: player.status,
+      }))
+    );
   };
 
   //
@@ -139,48 +145,8 @@ function Game() {
       console.error("Error updating player status:", error.message);
     }
   };
-  //
-
-  //
-
-  // useEffect(() => {
-  //   const setWinner = async () => {
-  //     if (!isWinner || !gameId || !user?.id) {
-  //       console.log("No winner or game ID or user ID found");
-  //       return;
-  //     }
-
-  //     try {
-  //       const { data: gameWin, error: gameWinError } = await supabase
-  //         .from("games")
-  //         .update({ winner: user.user_metadata.userName }) // Update winner with the user's ID
-  //         .eq("id", gameId) // Ensure the correct game is updated
-  //         .single();
-  //       console.log("gameWin", gameWin);
-  //       console.log("gameWinError", gameWinError);
-
-  //       if (gameWinError) {
-  //         throw new Error(gameWinError.message);
-  //       }
-
-  //       console.log("Winner updated successfully in games table:", gameWin);
-  //     } catch (error) {
-  //       console.error("Error updating winner in games table:", error.message);
-  //     }
-  //   };
-
-  //   setWinner();
-  // }, [isWinner, gameId, user]);
-
-  //
-
-  //
 
   // Subscriptions and Effects
-  useEffect(() => {
-    // getUserInfo();
-  }, []);
-
   useEffect(() => {
     fetchGameDetails(user, setGameId, setGameName);
   }, [user]);
