@@ -43,7 +43,7 @@ function Game() {
 
   const typingInputRef = useRef(null);
 
-  async function getUser() {
+  async function fetchUser() {
     const { data: authData, error: authError } = await supabase.auth.getUser();
     setUser(authData.user);
     console.log("authData: ", authData);
@@ -51,45 +51,86 @@ function Game() {
   }
 
   useEffect(() => {
-    getUser();
+    fetchUser();
   }, []);
 
-  const fetchGameDetails = async (user, setGameId, setGameName) => {
+  const fetchGameId = async (user, setGameId) => {
     if (!user) {
       console.log("No user provided");
-      return;
+      return null;
     }
 
     const { data: gamePlayerData, error: gamePlayerError } = await supabase
       .from("game_players")
-      .select("*")
+      .select("game_id")
       .eq("player_id", user.id)
       .single();
 
     if (gamePlayerError) {
       console.error("Failed to fetch game player:", gamePlayerError.message);
-      return;
+      return null;
+    }
+
+    setGameId(gamePlayerData.game_id);
+    return gamePlayerData.game_id;
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchGameId(user, setGameId);
+    }
+  }, [user]);
+
+  const fetchGameDetails = async (gameId, setGameName) => {
+    if (!gameId) {
+      console.log("No gameId provided");
+      return null;
     }
 
     const { data: gameData, error: gameError } = await supabase
       .from("games")
       .select("*")
-      .eq("id", gamePlayerData.game_id)
+      .eq("id", gameId)
       .single();
 
     if (gameError) {
       console.error("Failed to fetch game:", gameError.message);
-      return;
+      return null;
     }
 
-    setGameId(gamePlayerData.game_id);
     setGameName(gameData.game_name);
-    return { gamePlayerData, gameData };
+    return gameData;
   };
 
+  useEffect(() => {
+    if (gameId) {
+      fetchGameDetails(gameId, setGameName);
+    }
+  }, [gameId]);
   //
 
-  // Fetch Players in a Game
+  // Update Player Status
+  const updatePlayerStatus = async () => {
+    console.log("Updating player status...");
+    if (!gameId || percentComplete === null) return;
+    try {
+      const { error } = await supabase
+        .from("game_players")
+        .update({ status: percentComplete })
+        .eq("game_id", gameId)
+        .eq("player_id", user.id);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      console.log(`Player status updated to ${percentComplete}%`);
+    } catch (error) {
+      console.error("Error updating player status:", error.message);
+    }
+  };
+
+  // -----------------------------------------------------------------------------------
   const fetchPlayers = async (gameId, setPlayers) => {
     if (!gameId) {
       console.log("No gameId provided");
@@ -123,40 +164,8 @@ function Game() {
     );
   };
 
-  //
-
-  // Update Player Status
-  const updatePlayerStatus = async () => {
-    console.log("Updating player status...");
-    if (!gameId || percentComplete === null) return;
-    try {
-      const { error } = await supabase
-        .from("game_players")
-        .update({ status: percentComplete })
-        .eq("game_id", gameId)
-        .eq("player_id", user.id);
-
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      console.log(`Player status updated to ${percentComplete}%`);
-    } catch (error) {
-      console.error("Error updating player status:", error.message);
-    }
-  };
-
-  // Subscriptions and Effects
-  useEffect(() => {
-    fetchGameDetails(user, setGameId, setGameName);
-  }, [user]);
-
   useEffect(() => {
     fetchPlayers(gameId, setPlayers);
-  }, [gameId]);
-
-  useEffect(() => {
-    if (!gameId) return;
 
     const subscription = supabase
       .channel("game_players")
@@ -179,6 +188,7 @@ function Game() {
       subscription.unsubscribe();
     };
   }, [gameId]);
+  // -----------------------------------------------------------------------------------
 
   //
 
@@ -248,7 +258,7 @@ function Game() {
   }, [percentComplete, gameId]);
 
   const updateTimer = () => {
-    const elapsed = (new Date() - startTimeRef.current) / 1000; // Time in seconds
+    const elapsed = (new Date() - startTimeRef.current) / 1000;
     setTimeElapsed(elapsed.toFixed(0));
     updateCPM();
   };

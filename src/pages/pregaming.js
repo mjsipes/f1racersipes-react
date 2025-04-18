@@ -6,7 +6,7 @@ function Pregaming() {
   const [user, setUser] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
 
-  async function getUser() {
+  async function fetchUser() {
     const { data: authData, error: authError } = await supabase.auth.getUser();
     setUser(authData.user);
     console.log("authData: ", authData);
@@ -16,7 +16,7 @@ function Pregaming() {
     }
   }
 
-  async function getUserProfile(user) {
+  async function fetchUserProfile(user) {
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("*")
@@ -31,12 +31,12 @@ function Pregaming() {
   }
 
   useEffect(() => {
-    getUser();
+    fetchUser();
   }, []);
 
   useEffect(() => {
     if (user) {
-      getUserProfile(user);
+      fetchUserProfile(user);
     }
   }, [user]);
 
