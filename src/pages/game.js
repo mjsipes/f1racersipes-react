@@ -7,7 +7,7 @@ import supabase from "../supabaseClient";
 function Game() {
   // Game state
   const [gameId, setGameId] = useState(null);
-  const [gameName, setGameName] = useState("");
+  const [gameData, setGameData] = useState(null);
   const [prompt, setPrompt] = useState(
     "Dolphins are smart sea animals. They eat fish and squid. Dolphins are smart sea animals. They eat fish and squid."
   );
@@ -87,12 +87,33 @@ function Game() {
       return;
     }
     console.log("gameData: ", gameData);
-    setGameName(gameData.game_name);
-    return gameData;
+    setGameData(gameData);
+    if (gameData.prompt) {
+      setPrompt(gameData.prompt);
+    }
   }
   useEffect(() => {
     if (gameId) {
       fetchGameDetails(gameId);
+      const subscription = supabase
+        .channel("games")
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "games",
+            filter: `id=eq.${gameId}`,
+          },
+          (payload) => {
+            console.log("Game details subscription triggered:", payload);
+            fetchGameDetails(gameId);
+          }
+        )
+        .subscribe();
+      return () => {
+        subscription.unsubscribe();
+      };
     }
   }, [gameId]);
   //----------------------------------------------------------------------------
@@ -149,39 +170,6 @@ function Game() {
     };
   }, [gameId]);
   //----------------------------------------------------------------------------
-
-  // useEffect(() => {
-  //   if (!gameId) return;
-  //   const winnerSubscription = supabase
-  //     .channel("game_winners")
-  //     .on(
-  //       "postgres_changes",
-  //       {
-  //         event: "*",
-  //         schema: "public",
-  //         table: "games",
-  //         filter: `id=eq.${gameId}`,
-  //       },
-  //       (payload) => {
-  //         console.log("Winner subscription triggered:", payload);
-  //         console.log("winner:", payload.new.winner);
-  //         if (payload.new.winner !== user.user_metadata.userName) {
-  //           setIsWinner(false);
-  //           document.getElementById("endOfGameMessage").textContent =
-  //             "You lose :(";
-  //         }
-  //       }
-  //     )
-  //     .subscribe();
-
-  //   return () => {
-  //     winnerSubscription.unsubscribe();
-  //   };
-  // }, [gameId]);
-
-  //
-
-  //
 
   //----------------------------------------------------------------------------
   async function updatePlayerStatus() {
@@ -352,8 +340,7 @@ function Game() {
                   ? user.user_metadata.email
                   : "Guest"}
               </span>
-              , playing in
-              {gameName}
+              , playing in {gameData?.game_name}
             </h2>
           </div>
           <span id="playerPositionTable">
@@ -370,11 +357,11 @@ function Game() {
                 </thead>
                 <tbody>
                   {players.map((player) => (
-                    <tr key={player.id} style={{ cursor: "pointer" }}>
+                    <tr key={player.playerId} style={{ cursor: "pointer" }}>
                       {Object.entries(player)
                         .filter(([key]) => key !== "playerId")
-                        .map(([key, value], index) => (
-                          <td key={index}>{value}</td>
+                        .map(([key, value]) => (
+                          <td key={`${player.playerId}-${key}`}>{value}</td>
                         ))}
                     </tr>
                   ))}
