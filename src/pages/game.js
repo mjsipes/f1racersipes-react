@@ -343,7 +343,7 @@ function Game() {
               , playing in {gameData?.game_name}
             </h2>
           </div>
-          <span id="playerPositionTable">
+          <div id="playerPositionTable">
             {players.length > 0 && (
               <table>
                 <thead>
@@ -368,7 +368,7 @@ function Game() {
                 </tbody>
               </table>
             )}
-          </span>
+          </div>
           <div className="prompt">Prompt: {renderPrompt()}</div>
           <br />
           <input

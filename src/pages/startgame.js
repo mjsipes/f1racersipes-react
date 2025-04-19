@@ -27,6 +27,9 @@ function StartGame() {
       return;
     }
     console.log("game: ", game);
+    const { data, error } = supabase.functions.invoke("generate-prompt2", {
+      body: { id: game.id, customTopic: customTopic, difficulty: difficulty },
+    });
     await joinGame(game.id);
     window.location.href = `/game`;
   }
