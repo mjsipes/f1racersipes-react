@@ -2,15 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { redirectTo } from "../utils/redirectTo";
 import Chat from "../components/Chat";
 import GameStats from "../components/GameStats";
-
 import supabase from "../supabaseClient";
-
-/**
- * @typedef {Object} Player
- * @property {string} playerId
- * @property {string} userName
- * @property {string} status
- */
 
 function Game() {
   // Game state
@@ -19,9 +11,7 @@ function Game() {
   const [prompt, setPrompt] = useState(
     "Dolphins are smart sea animals. They eat fish and squid. Dolphins are smart sea animals. They eat fish and squid."
   );
-  /**
-   * @type {Player[]}
-   */
+
   const [players, setPlayers] = useState([]);
 
   // Player state
@@ -40,121 +30,94 @@ function Game() {
 
   const startTimeRef = useRef(null);
   const intervalRef = useRef(null);
-
   const typingInputRef = useRef(null);
 
+  //----------------------------------------------------------------------------
   async function fetchUser() {
     const { data: authData, error: authError } = await supabase.auth.getUser();
-    setUser(authData.user);
     console.log("authData: ", authData);
     console.log("authError: ", authError);
+    setUser(authData.user);
   }
-
   useEffect(() => {
     fetchUser();
   }, []);
+  //----------------------------------------------------------------------------
 
-  const fetchGameId = async (user, setGameId) => {
+  //----------------------------------------------------------------------------
+  async function fetchGameId(user) {
     if (!user) {
       console.log("No user provided");
-      return null;
+      return;
     }
-
     const { data: gamePlayerData, error: gamePlayerError } = await supabase
       .from("game_players")
       .select("game_id")
       .eq("player_id", user.id)
       .single();
-
     if (gamePlayerError) {
-      console.error("Failed to fetch game player:", gamePlayerError.message);
-      return null;
+      console.log("Failed to fetch game player:", gamePlayerError.message);
+      alert("Failed to fetch game player:", gamePlayerError.message);
+      return;
     }
-
+    console.log("gamePlayerData: ", gamePlayerData);
     setGameId(gamePlayerData.game_id);
-    return gamePlayerData.game_id;
-  };
-
+  }
   useEffect(() => {
     if (user) {
-      fetchGameId(user, setGameId);
+      fetchGameId(user);
     }
   }, [user]);
+  //----------------------------------------------------------------------------
 
-  const fetchGameDetails = async (gameId, setGameName) => {
+  //----------------------------------------------------------------------------
+  async function fetchGameDetails(gameId) {
     if (!gameId) {
       console.log("No gameId provided");
-      return null;
+      return;
     }
-
     const { data: gameData, error: gameError } = await supabase
       .from("games")
       .select("*")
       .eq("id", gameId)
       .single();
-
     if (gameError) {
-      console.error("Failed to fetch game:", gameError.message);
-      return null;
+      console.log("Failed to fetch game:", gameError.message);
+      alert("Failed to fetch game:", gameError.message);
+      return;
     }
-
+    console.log("gameData: ", gameData);
     setGameName(gameData.game_name);
     return gameData;
-  };
-
+  }
   useEffect(() => {
     if (gameId) {
-      fetchGameDetails(gameId, setGameName);
+      fetchGameDetails(gameId);
     }
   }, [gameId]);
-  //
+  //----------------------------------------------------------------------------
 
-  // Update Player Status
-  const updatePlayerStatus = async () => {
-    console.log("Updating player status...");
-    if (!gameId || percentComplete === null) return;
-    try {
-      const { error } = await supabase
-        .from("game_players")
-        .update({ status: percentComplete })
-        .eq("game_id", gameId)
-        .eq("player_id", user.id);
-
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      console.log(`Player status updated to ${percentComplete}%`);
-    } catch (error) {
-      console.error("Error updating player status:", error.message);
-    }
-  };
-
-  // -----------------------------------------------------------------------------------
-  const fetchPlayers = async (gameId, setPlayers) => {
+  //----------------------------------------------------------------------------
+  async function fetchPlayers(gameId) {
     if (!gameId) {
       console.log("No gameId provided");
       return;
     }
-
     console.log("Fetching players...");
-
     const { data: playersData, error: playersError } = await supabase
       .from("game_players")
       .select("*")
       .eq("game_id", gameId)
       .order("player_id");
-
     if (playersError) {
-      console.error("Failed to fetch players:", playersError.message);
+      console.log("Failed to fetch players:", playersError.message);
+      alert("Failed to fetch players:", playersError.message);
       return;
     }
-
     if (!playersData) {
-      console.error("Players data not found.");
+      console.log("No player data found.");
       return;
     }
-
     setPlayers(
       playersData.map((player) => ({
         playerId: player.player_id,
@@ -162,11 +125,9 @@ function Game() {
         status: player.status,
       }))
     );
-  };
-
+  }
   useEffect(() => {
-    fetchPlayers(gameId, setPlayers);
-
+    fetchPlayers(gameId);
     const subscription = supabase
       .channel("game_players")
       .on(
@@ -183,16 +144,12 @@ function Game() {
         }
       )
       .subscribe();
-
     return () => {
       subscription.unsubscribe();
     };
   }, [gameId]);
-  // -----------------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
 
-  //
-
-  //
   // useEffect(() => {
   //   if (!gameId) return;
   //   const winnerSubscription = supabase
@@ -225,6 +182,24 @@ function Game() {
   //
 
   //
+
+  //----------------------------------------------------------------------------
+  async function updatePlayerStatus() {
+    console.log("Updating player status...");
+    if (!gameId || percentComplete === null) return;
+    const { error } = await supabase
+      .from("game_players")
+      .update({ status: percentComplete })
+      .eq("game_id", gameId)
+      .eq("player_id", user.id);
+    if (error) {
+      console.log("Error updating player status:", error.message);
+      alert("Error updating player status:", error.message);
+      return;
+    }
+    console.log(`Player status updated to ${percentComplete}%`);
+  }
+  //----------------------------------------------------------------------------
 
   //
 

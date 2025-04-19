@@ -6,36 +6,27 @@ function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  
 
-  const handleSubmit = async (event) => {
+  async function handleSubmit(event) {
     event.preventDefault();
-
-    // Check if passwords match
     if (password !== confirmPassword) {
       console.log("Passwords do not match.");
       alert("Passwords do not match.");
       return;
     }
-
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      if (data.user) {
-        redirectTo("/pregaming");
-      }
-    } catch (error) {
-      console.error(error);
-      alert(error.message);
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+    if (error) {
+      console.log("error: ", error);
+      alert(error);
+      return;
     }
-  };
+    if (data.user) {
+      redirectTo("/pregaming");
+    }
+  }
 
   return (
     <div>

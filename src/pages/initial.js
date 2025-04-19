@@ -5,7 +5,6 @@ import { redirectTo } from "../utils/redirectTo";
 function Initial() {
   console.log(window.performance);
   console.log(window.localStorage);
-
   const handlePlayAsGuest = async (event) => {
     event.preventDefault();
     const isConfirmed = window.confirm(
@@ -43,7 +42,6 @@ function Initial() {
           Play as Guest
         </button>
       </div>
-      
     </div>
   );
 }

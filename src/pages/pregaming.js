@@ -8,12 +8,12 @@ function Pregaming() {
 
   async function fetchUser() {
     const { data: authData, error: authError } = await supabase.auth.getUser();
-    setUser(authData.user);
-    console.log("authData: ", authData);
     if (authError) {
       console.log("authError: ", authError);
       alert(authError);
     }
+    setUser(authData.user);
+    console.log("authData: ", authData);
   }
 
   async function fetchUserProfile(user) {
@@ -22,12 +22,12 @@ function Pregaming() {
       .select("*")
       .eq("id", user.id)
       .single();
-    setUserProfile(profile);
-    console.log("profile: ", profile);
     if (profileError) {
       console.log("profileError: ", profileError);
       alert(profileError);
     }
+    setUserProfile(profile);
+    console.log("profile: ", profile);
   }
 
   useEffect(() => {

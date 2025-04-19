@@ -5,22 +5,27 @@ import joinGame from "../utils/joinGame";
 function JoinGame() {
   const [games, setGames] = useState([]);
 
+  async function handleJoinGame(gameId) {
+    await joinGame(gameId);
+    window.location.href = `/game`;
+  }
+
+  //----------------------------------------------------------------------------
   async function fetchGames() {
     const { data: selectGames, error: selectGamesError } = await supabase
       .from("games")
       .select("*")
       .eq("state", "waiting");
+    if (selectGamesError) {
+      console.log("selectGamesError: ", selectGamesError);
+      alert("selectGamesError: ", selectGamesError);
+      return;
+    }
     console.log("selectGames: ", selectGames);
-    console.log("selectGamesError: ", selectGamesError);
     setGames(selectGames);
   }
-
   useEffect(() => {
     fetchGames();
-  }, []);
-
-  //subscribes me to games changes
-  useEffect(() => {
     const subscription = supabase
       .channel("games")
       .on(
@@ -38,16 +43,16 @@ function JoinGame() {
       subscription.unsubscribe();
     };
   }, []);
-
-  async function handleJoinGame (gameId){
-    await joinGame(gameId);
-    window.location.href = `/game`;
-  };
+  //----------------------------------------------------------------------------
 
   return (
     <div className="container">
       <div className="header">
-        <img src="/F1RacerLogo.png" alt="this is the logo" className="f1racerlogosmall"/>
+        <img
+          src="/F1RacerLogo.png"
+          alt="this is the logo"
+          className="f1racerlogosmall"
+        />
         <h2>Join a Race</h2>
       </div>
       <span id="gameServerNote">

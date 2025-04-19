@@ -6,15 +6,9 @@ function StartGame() {
   const [gameServerName, setGameServerName] = useState("");
   const [difficulty, setDifficulty] = useState(1);
   const [customTopic, setCustomTopic] = useState("");
-  const [message, setMessage] = useState("");
 
   async function handleSubmit(event) {
     event.preventDefault();
-    const { data: user } = await supabase.auth.getUser();
-    if (!user) {
-      setMessage("You must be logged in to create a game.");
-      return;
-    }
     const { data: game, error: insertError } = await supabase
       .from("games")
       .insert([
@@ -27,11 +21,12 @@ function StartGame() {
       ])
       .select()
       .single();
-    console.log("game: ", game);
     if (insertError) {
-      setMessage("Failed to create game: " + insertError.message);
+      console.log(insertError, insertError);
+      alert("insertError" + insertError.message);
       return;
     }
+    console.log("game: ", game);
     await joinGame(game.id);
     window.location.href = `/game`;
   }
@@ -81,12 +76,10 @@ function StartGame() {
           value={customTopic}
           onChange={(e) => setCustomTopic(e.target.value)}
         />
-          <button type="submit" className="button">
-            Start Game
-          </button>
+        <button type="submit" className="button">
+          Start Game
+        </button>
       </form>
-
-      {message && <p>{message}</p>}
     </div>
   );
 }

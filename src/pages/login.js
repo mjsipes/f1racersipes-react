@@ -6,27 +6,22 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = async (event) => {
+  async function handleSubmit(event) {
     event.preventDefault();
 
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      if (data.user) {
-        redirectTo("/pregaming");
-      }
-    } catch (error) {
-      console.error(error);
-      alert(error.message);
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) {
+      console.log("error: ", error);
+      alert(error);
+      return;
     }
-  };
+    if (data.user) {
+      redirectTo("/pregaming");
+    }
+  }
 
   return (
     <div>
