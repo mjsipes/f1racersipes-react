@@ -8,9 +8,7 @@ function Game() {
   // Game state
   const [gameId, setGameId] = useState(null);
   const [gameData, setGameData] = useState(null);
-  const [prompt, setPrompt] = useState(
-    "Dolphins are smart sea animals. They eat fish and squid. Dolphins are smart sea animals. They eat fish and squid."
-  );
+  const [prompt, setPrompt] = useState(null);
 
   const [players, setPlayers] = useState([]);
 
@@ -187,17 +185,17 @@ function Game() {
     }
     console.log(`Player status updated to ${percentComplete}%`);
   }
+  useEffect(() => {
+    updatePlayerStatus();
+  }, [percentComplete]);
+
   //----------------------------------------------------------------------------
 
   //
 
   //
 
-  //
-
-  //
-
-  //
+  //----------------------------------------------------------------------------
   const handleTypingInput = (event) => {
     console.log("Handling typing input");
     if (!startTimeRef.current) {
@@ -215,10 +213,6 @@ function Game() {
     updatePercentComplete(newResponse);
     updateIsWinnerOrLoser();
   };
-
-  useEffect(() => {
-    updatePlayerStatus();
-  }, [percentComplete, gameId]);
 
   const updateTimer = () => {
     const elapsed = (new Date() - startTimeRef.current) / 1000;
@@ -252,7 +246,6 @@ function Game() {
         2
       );
       setPercentComplete(completion);
-      // send("percentComplete", completion);
     }
   };
 
@@ -263,13 +256,13 @@ function Game() {
       setIsWinner(true);
       console.log("You win :)");
       document.getElementById("endOfGameMessage").textContent = "You win :)";
-      // send("isWinner", true);
     }
   };
+  //----------------------------------------------------------------------------
 
-  // Render the prompt with colored characters
+  //----------------------------------------------------------------------------
   const renderPrompt = () => {
-    // Find the index where the error starts (if any)
+    if (!prompt) return;
     let errorIndex = -1;
     for (let i = 0; i < response.length; i++) {
       if (response[i] !== prompt[i]) {
@@ -277,18 +270,12 @@ function Game() {
         break;
       }
     }
-
-    // If there's no error, but the response is longer than the prompt
     if (errorIndex === -1 && response.length > prompt.length) {
       errorIndex = prompt.length;
     }
-
-    // If there's no error at all
     if (errorIndex === -1) {
-      // Split the prompt into completed (green) and remaining parts
       const completedPart = prompt.substring(0, response.length);
       const remainingPart = prompt.substring(response.length);
-
       return (
         <span id="prompt">
           <span style={{ color: "#4CAF50" }}>{completedPart}</span>
@@ -296,11 +283,9 @@ function Game() {
         </span>
       );
     } else {
-      // There's an error: split into correct, incorrect, and remaining parts
       const correctPart = prompt.substring(0, errorIndex);
       const incorrectPart = response.substring(errorIndex);
       const remainingPart = prompt.substring(errorIndex);
-
       return (
         <span id="prompt">
           <span style={{ color: "#4CAF50" }}>{correctPart}</span>
@@ -310,11 +295,7 @@ function Game() {
       );
     }
   };
-  //
-
-  //
-
-  //
+  //----------------------------------------------------------------------------
 
   //
 
