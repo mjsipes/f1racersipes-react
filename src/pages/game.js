@@ -333,9 +333,13 @@ function Game() {
               alt="logo"
               className="f1racerlogosmall"
             />
-            <h2 className="headerwelcomemessage">
-              F1Racer, <span>{user?.user_metadata?.full_name}</span>, playing in{" "}
-              {gameData?.game_name}
+            <h2>
+              <div style={{ textAlign: "left" }}>
+                F1Racer: {user?.user_metadata?.full_name}
+              </div>
+              <div style={{ textAlign: "left" }}>
+                Game Server: {gameData?.game_name}
+              </div>
             </h2>
           </div>
           <div id="playerPositionTable">
@@ -364,7 +368,7 @@ function Game() {
               </table>
             )}
           </div>
-          <div className="prompt">Prompt: {renderPrompt()}</div>
+          <div className="prompt">{renderPrompt()}</div>
           <br />
           <input
             type="text"
