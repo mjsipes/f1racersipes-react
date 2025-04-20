@@ -263,17 +263,21 @@ function Game() {
     const chatCard = document.querySelector(".chat-card");
 
     if (gameData.winner == user.id) {
-      console.log("you win");
       gameStatsCard.style.background = "lightgreen";
       gameHeader.style.background = "lightgreen";
       chatCard.style.background = "lightgreen";
-      chatCard.style.background = "tableRow";
+      console.log("you win");
+      setTimeout(() => {
+        alert("You win!");
+      }, 50);
     } else {
-      console.log("you lose");
-      alert("You lose!");
       gameStatsCard.style.background = "lightcoral";
       gameHeader.style.background = "lightcoral";
       chatCard.style.background = "lightcoral";
+      console.log("you lose");
+      setTimeout(() => {
+        alert("You lose!");
+      }, 50);
     }
   }
 
