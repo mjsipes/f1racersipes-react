@@ -58,10 +58,10 @@ function Pregaming() {
       {userProfile && (
         <section className="player-stats">
           <p>
-            <span>{userProfile.gamesPlayed}</span> games played.{" "}
+            <span>{userProfile.games_played}</span> games played.{" "}
             <span>{userProfile.gamesWon}</span> games won.{" "}
-            <span>{userProfile.totalWordsTyped}</span> total words typed.{" "}
-            <span>{userProfile.bestWpm}</span> WPM highscore.
+            <span>{userProfile.total_words_typed}</span> total words typed.{" "}
+            <span>{userProfile.best_wpm}</span> WPM highscore.
           </p>
         </section>
       )}

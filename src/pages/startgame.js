@@ -5,7 +5,7 @@ import joinGame from "../utils/joinGame";
 function StartGame() {
   const [gameServerName, setGameServerName] = useState("");
   const [difficulty, setDifficulty] = useState(1);
-  const [customTopic, setCustomTopic] = useState("");
+  const [custom_topic, setcustom_topic] = useState("");
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -13,7 +13,7 @@ function StartGame() {
       .from("games")
       .insert([
         {
-          customTopic: customTopic,
+          custom_topic: custom_topic,
           difficulty: difficulty,
           state: "waiting",
           game_name: gameServerName,
@@ -66,15 +66,15 @@ function StartGame() {
           onChange={(e) => setDifficulty(e.target.value)}
         />
 
-        <label htmlFor="customTopic">Prompt Type</label>
+        <label htmlFor="custom_topic">Prompt Type</label>
         <input
           type="text"
-          id="customTopic"
-          name="customTopic"
+          id="custom_topic"
+          name="custom_topic"
           className="topic-box"
           placeholder="Enter custom topic. Leave blank to default to random."
-          value={customTopic}
-          onChange={(e) => setCustomTopic(e.target.value)}
+          value={custom_topic}
+          onChange={(e) => setcustom_topic(e.target.value)}
         />
         <button type="submit" className="button">
           Start Game

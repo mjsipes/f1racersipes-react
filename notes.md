@@ -7,7 +7,7 @@ supabase database password: 5UIpazE8h9qBBS07
 curl -L -X POST 'https://umkaqxgnqgsvzngsgpeh.supabase.co/functions/v1/generate-prompt' \
   -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVta2FxeGducWdzdnpuZ3NncGVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjA3MjA5NDYsImV4cCI6MjAzNjI5Njk0Nn0.F2KBWbtCvdNNwfPG0PDetHymgh29_RQPpkASya_KVto' \
   -H 'Content-Type: application/json' \
-  --data '{"id":122, "customTopic": "monkeys", "difficulty": 5}'
+  --data '{"id":122, "custom_topic": "monkeys", "difficulty": 5}'
 
   
 stripe has a beutiful website
