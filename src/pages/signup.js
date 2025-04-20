@@ -4,19 +4,20 @@ import { redirectTo } from "../utils/redirectTo";
 
 function Signup() {
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
 
   async function handleSubmit(event) {
     event.preventDefault();
-    if (password !== confirmPassword) {
-      console.log("Passwords do not match.");
-      alert("Passwords do not match.");
-      return;
-    }
+
     const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
+      email: email,
+      password: password,
+      options: {
+        data: {
+          full_name: username,
+        },
+      },
     });
     if (error) {
       console.log("error: ", error);
@@ -42,6 +43,15 @@ function Signup() {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
+          <label htmlFor="username">Username</label>
+          <input
+            type="username"
+            id="username"
+            name="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
           <label htmlFor="password">Password</label>
           <input
             type="password"
@@ -49,15 +59,6 @@ function Signup() {
             name="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <label htmlFor="confirm_password">Confirm Password</label>
-          <input
-            type="password"
-            id="confirm_password"
-            name="confirm_password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
             required
           />
           <button type="submit" className="button">

@@ -27,7 +27,7 @@ async function joinGame(selectedGameId) {
         game_id: selectedGameId,
         player_id: user.id,
         status: 0,
-        userName: user.email,
+        username: user.user_metadata.full_name,
       },
     ]);
   console.log("joinData: ", joinData);

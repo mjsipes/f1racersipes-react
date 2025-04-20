@@ -50,8 +50,8 @@ function Pregaming() {
         />
         <h2>
           {"Prepare to race "}
-          {user?.user_metadata?.userName && (
-            <span>{user.user_metadata.userName}</span>
+          {user?.user_metadata?.full_name && (
+            <span>{user.user_metadata.full_name}</span>
           )}
         </h2>
       </header>

@@ -13,10 +13,10 @@ function Initial() {
 
     if (isConfirmed) {
       const { data: signInData, error: signInError } =
-        await supabase.auth.signInAnonymously();
-      const { data: updateData, error: updateError } =
-        await supabase.auth.updateUser({
-          data: { userName: "guest", full_name: "guest" },
+        await supabase.auth.signInAnonymously({
+          options: {
+            data: { full_name: "guest" },
+          },
         });
       redirectTo("/pregaming");
     }

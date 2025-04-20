@@ -142,7 +142,7 @@ function Game() {
     setPlayers(
       playersData.map((player) => ({
         playerId: player.player_id,
-        userName: player.userName,
+        username: player.username,
         status: player.status,
       }))
     );
@@ -334,13 +334,8 @@ function Game() {
               className="f1racerlogosmall"
             />
             <h2 className="headerwelcomemessage">
-              F1Racer,{" "}
-              <span>
-                {user?.user_metadata?.email
-                  ? user.user_metadata.email
-                  : "Guest"}
-              </span>
-              , playing in {gameData?.game_name}
+              F1Racer, <span>{user?.user_metadata?.full_name}</span>, playing in{" "}
+              {gameData?.game_name}
             </h2>
           </div>
           <div id="playerPositionTable">
