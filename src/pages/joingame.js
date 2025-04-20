@@ -14,8 +14,7 @@ function JoinGame() {
   async function fetchGames() {
     const { data: selectGames, error: selectGamesError } = await supabase
       .from("games")
-      .select("*")
-      .eq("state", "waiting");
+      .select("*");
     if (selectGamesError) {
       console.log("selectGamesError: ", selectGamesError);
       alert("selectGamesError: ", selectGamesError);
@@ -66,9 +65,7 @@ function JoinGame() {
             <thead>
               <tr>
                 <th>Game Name</th>
-                <th>ID</th>
-                <th>Created At</th>
-                <th>Winner</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -79,9 +76,7 @@ function JoinGame() {
                   style={{ cursor: "pointer" }}
                 >
                   <td>{game.game_name}</td>
-                  <td>{game.id}</td>
-                  <td>{game.created_at}</td>
-                  <td>{game.winner}</td>
+                  <td>{game.state}</td>
                 </tr>
               ))}
             </tbody>

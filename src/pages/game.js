@@ -18,7 +18,6 @@ function Game() {
   const [response, setResponse] = useState("");
   const [numErrors, setNumErrors] = useState(0);
   const [isError, setIsError] = useState(false);
-  const [isWinner, setIsWinner] = useState(false);
   const [timeElapsed, setTimeElapsed] = useState(0);
 
   // Player stats
@@ -33,10 +32,10 @@ function Game() {
 
   //----------------------------------------------------------------------------
   async function fetchUser() {
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    console.log("authData: ", authData);
-    console.log("authError: ", authError);
-    setUser(authData.user);
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+    console.log("userData: ", userData);
+    console.log("userError: ", userError);
+    setUser(userData.user);
   }
   useEffect(() => {
     fetchUser();
@@ -71,6 +70,7 @@ function Game() {
 
   //----------------------------------------------------------------------------
   async function fetchGameDetails(gameId) {
+    console.log("fetchingGameDetails");
     if (!gameId) {
       console.log("No gameId provided");
       return;
@@ -90,7 +90,11 @@ function Game() {
     if (gameData.prompt) {
       setPrompt(gameData.prompt);
     }
+    if (gameData.winner) {
+      setWinnerDisplay(gameData);
+    }
   }
+
   useEffect(() => {
     if (gameId) {
       fetchGameDetails(gameId);
@@ -197,7 +201,7 @@ function Game() {
   //
 
   //----------------------------------------------------------------------------
-  const handleTypingInput = (event) => {
+  function handleTypingInput(event) {
     console.log("Handling typing input");
     if (!startTimeRef.current) {
       startTimeRef.current = new Date();
@@ -212,8 +216,7 @@ function Game() {
     updateAccuracy(newResponse.length);
     updateCPM();
     updatePercentComplete(newResponse);
-    updateIsWinnerOrLoser();
-  };
+  }
 
   const updateTimer = () => {
     const elapsed = (new Date() - startTimeRef.current) / 1000;
@@ -250,20 +253,29 @@ function Game() {
     }
   };
 
-  const updateIsWinnerOrLoser = () => {
-    console.log("updating winner or looser");
-    console.log("percentComplete", percentComplete);
-    if (parseInt(percentComplete, 10) === 100) {
-      setIsWinner(true);
-      console.log("You win :)");
-      document.getElementById("endOfGameMessage").textContent = "You win :)";
+  //
+
+  //
+
+  function setWinnerDisplay(gameData) {
+    const gameStatsCard = document.querySelector(".game-stats-card");
+    const gameHeader = document.querySelector(".game-header");
+    const chatCard = document.querySelector(".chat-card");
+
+    if (gameData.winner == user.id) {
+      console.log("you win");
+      gameStatsCard.style.background = "lightgreen";
+      gameHeader.style.background = "lightgreen";
+      chatCard.style.background = "lightgreen";
+      chatCard.style.background = "tableRow";
+    } else {
+      console.log("you lose");
+      alert("You lose!");
+      gameStatsCard.style.background = "lightcoral";
+      gameHeader.style.background = "lightcoral";
+      chatCard.style.background = "lightcoral";
     }
-  };
-  //----------------------------------------------------------------------------
-
-  //
-
-  //
+  }
 
   return (
     <>
