@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { redirectTo } from "../utils/redirectTo";
 import Chat from "../components/Chat";
 import GameStats from "../components/GameStats";
+import PromptDisplay from "../components/PromptDisplay";
 import supabase from "../supabaseClient";
 
 function Game() {
@@ -260,43 +261,6 @@ function Game() {
   };
   //----------------------------------------------------------------------------
 
-  //----------------------------------------------------------------------------
-  const renderPrompt = () => {
-    if (!prompt) return;
-    let errorIndex = -1;
-    for (let i = 0; i < response.length; i++) {
-      if (response[i] !== prompt[i]) {
-        errorIndex = i;
-        break;
-      }
-    }
-    if (errorIndex === -1 && response.length > prompt.length) {
-      errorIndex = prompt.length;
-    }
-    if (errorIndex === -1) {
-      const completedPart = prompt.substring(0, response.length);
-      const remainingPart = prompt.substring(response.length);
-      return (
-        <span id="prompt">
-          <span style={{ color: "#4CAF50" }}>{completedPart}</span>
-          {remainingPart}
-        </span>
-      );
-    } else {
-      const correctPart = prompt.substring(0, errorIndex);
-      const incorrectPart = response.substring(errorIndex);
-      const remainingPart = prompt.substring(errorIndex);
-      return (
-        <span id="prompt">
-          <span style={{ color: "#4CAF50" }}>{correctPart}</span>
-          <span style={{ color: "#FF0000" }}>{incorrectPart}</span>
-          {remainingPart}
-        </span>
-      );
-    }
-  };
-  //----------------------------------------------------------------------------
-
   //
 
   //
@@ -349,7 +313,7 @@ function Game() {
               </table>
             )}
           </div>
-          <div className="prompt">{renderPrompt()}</div>
+          <PromptDisplay prompt={prompt} response={response} />
           <br />
           <input
             type="text"
