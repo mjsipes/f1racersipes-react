@@ -1,6 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import supabase from "../supabaseClient";
+import Header from "../components/Header";
 
 function Pregaming() {
   const [user, setUser] = useState(null);
@@ -41,52 +42,55 @@ function Pregaming() {
   }, [user]);
 
   return (
-    <div className="container">
-      <header className="header">
+    <>
+      <Header />
+      <div className="container-w-nav">
+        <header className="header">
+          <img
+            src="F1RacerLogo.png"
+            alt="this is the logo"
+            className="f1racerlogosmall"
+          />
+          <h2>
+            {"Prepare to race "}
+            {user?.user_metadata?.full_name && (
+              <span>{user.user_metadata.full_name}</span>
+            )}
+          </h2>
+        </header>
+        {userProfile && (
+          <section className="player-stats">
+            <p>
+              <span>{userProfile.games_played}</span> games played.{" "}
+              <span>{userProfile.gamesWon}</span> games won.{" "}
+              <span>{userProfile.total_words_typed}</span> total words typed.{" "}
+              <span>{userProfile.best_wpm}</span> WPM highscore.
+            </p>
+          </section>
+        )}
+
         <img
-          src="F1RacerLogo.png"
-          alt="this is the logo"
-          className="f1racerlogosmall"
+          src="/Racetrack.png"
+          alt="this is the racetrack"
+          className="racetrack-image"
         />
-        <h2>
-          {"Prepare to race "}
-          {user?.user_metadata?.full_name && (
-            <span>{user.user_metadata.full_name}</span>
-          )}
-        </h2>
-      </header>
-      {userProfile && (
-        <section className="player-stats">
-          <p>
-            <span>{userProfile.games_played}</span> games played.{" "}
-            <span>{userProfile.gamesWon}</span> games won.{" "}
-            <span>{userProfile.total_words_typed}</span> total words typed.{" "}
-            <span>{userProfile.best_wpm}</span> WPM highscore.
-          </p>
-        </section>
-      )}
 
-      <img
-        src="/Racetrack.png"
-        alt="this is the racetrack"
-        className="racetrack-image"
-      />
-
-      <div className="buttons">
-        <button
-          className="button"
-          onClick={() => (window.location.href = "/startgame")}
-        >
-          Start Game
-        </button>
-        <button
-          className="button"
-          onClick={() => (window.location.href = "/joingame")}
-        >
-          Join Game
-        </button>
+        <div className="buttons">
+          <button
+            className="button"
+            onClick={() => (window.location.href = "/startgame")}
+          >
+            Start Game
+          </button>
+          <button
+            className="button"
+            onClick={() => (window.location.href = "/joingame")}
+          >
+            Join Game
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

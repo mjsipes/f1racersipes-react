@@ -3,6 +3,7 @@ import { redirectTo } from "../utils/redirectTo";
 import Chat from "../components/Chat";
 import GameStats from "../components/GameStats";
 import PromptDisplay from "../components/PromptDisplay";
+import Header from "../components/Header";
 import supabase from "../supabaseClient";
 
 function Game() {
@@ -320,6 +321,7 @@ function Game() {
 
   return (
     <>
+      <Header />
       <div style={{ display: "flex" }}>
         <div className="secondary-container">
           <Chat gameId={gameId} />
