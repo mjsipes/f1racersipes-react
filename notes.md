@@ -17,7 +17,6 @@ practices CI/CD Pipeline: Set up automated deployment
 create header .
 
 characters to words. correct timer / game stats. think about when
-updatePlayerProfile should be called. round table:
-https://www.youtube.com/watch?v=OXGznpKZ_sA&t=31563s
+updatePlayerProfile should be called.
 
 correct game to start 30 seconds after creation.

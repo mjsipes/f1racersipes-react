@@ -5,6 +5,7 @@ import GameStats from "../components/GameStats";
 import PromptDisplay from "../components/PromptDisplay";
 import Header from "../components/Header";
 import supabase from "../supabaseClient";
+import updatePlayerProfile from "../utils/updatePlayerProfile.js";
 
 function Game() {
   // Game state
@@ -93,7 +94,7 @@ function Game() {
     }
     if (gameData.winner) {
       setWinnerDisplay(gameData);
-      updatePlayerProfile(gameData);
+      updatePlayerProfile(gameData, user, numCharactersTyped);
     }
   }
 
@@ -204,6 +205,7 @@ function Game() {
 
   //----------------------------------------------------------------------------
   function handleTypingInput(event) {
+    console.log("\n");
     console.log("Handling typing input");
     if (!startTimeRef.current) {
       startTimeRef.current = new Date();
@@ -218,6 +220,7 @@ function Game() {
     updateAccuracy(newResponse.length);
     updateCPM();
     updatePercentComplete(newResponse);
+    console.log("\n");
   }
 
   const updateTimer = () => {
@@ -252,48 +255,18 @@ function Game() {
         2
       );
       setPercentComplete(completion);
+
+      // Check if typing is complete (100%) and stop the timer
+      if (parseFloat(completion) >= 100) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
     }
   };
 
   //
 
   //
-
-  async function updatePlayerProfile(gameData) {
-    if (!user) return;
-    let isWinner;
-    if (gameData.winner == user.id) {
-      isWinner = true;
-    } else {
-      isWinner = false;
-    }
-    const wordsTyped = Math.floor(numCharactersTyped / 5);
-    const { data: profileData, error: profileError } = await supabase
-      .from("profiles")
-      .select("games_played, gamesWon, total_words_typed")
-      .eq("id", user.id)
-      .single();
-    if (profileError) {
-      console.error("Error fetching profile:", profileError.message);
-      return;
-    }
-
-    const { data: updateData, error: updateError } = await supabase
-      .from("profiles")
-      .update({
-        games_played: (profileData.games_played || 0) + 1,
-        gamesWon: isWinner
-          ? (profileData.gamesWon || 0) + 1
-          : profileData.gamesWon || 0,
-        total_words_typed: (profileData.total_words_typed || 0) + wordsTyped,
-      })
-      .eq("id", user.id);
-    if (updateError) {
-      console.error("updateError:", updateError.message);
-    } else {
-      console.log("updateData", updateData);
-    }
-  }
 
   function setWinnerDisplay(gameData) {
     const gameStatsCard = document.querySelector(".game-stats-card");
