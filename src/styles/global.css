@@ -363,10 +363,9 @@ input:not([type="range"]) {
 
 .error-message {
   color: #ff3333;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: bold;
 }
-
 /* chat styles */
 .chat-card {
   border: 2px solid #e74c3c;

@@ -25,7 +25,10 @@ const GameStats = ({
         </div>
       </div>
       <div className="stats-progress">
-        <div className="progress-container">
+        <div
+          className="progress-container"
+          style={{ margin: "0 auto", width: "100%" }}
+        >
           <div className="stats-label">Progress</div>
           <div className="progress-bar-bg">
             <div
@@ -34,10 +37,8 @@ const GameStats = ({
             ></div>
           </div>
         </div>
-        <div className="stats-column">
-          {isError && <div className="error-message">Error detected!</div>}
-        </div>
       </div>
+      {isError && <div className="error-message">Error detected!</div>}
     </div>
   );
 };
