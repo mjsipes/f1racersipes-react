@@ -14,7 +14,8 @@ function JoinGame() {
   async function fetchGames() {
     const { data: selectGames, error: selectGamesError } = await supabase
       .from("games")
-      .select("*");
+      .select("*")
+      .neq("state", "finished");
     if (selectGamesError) {
       console.log("selectGamesError: ", selectGamesError);
       alert("selectGamesError: ", selectGamesError);
