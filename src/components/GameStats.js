@@ -1,6 +1,12 @@
-import React from 'react';
+import React from "react";
 
-const GameStats = ({ timeElapsed, CPM, numCharactersTyped, percentComplete, isError }) => {
+const GameStats = ({
+  timeElapsed,
+  WPM,
+  numWordsTyped,
+  percentComplete,
+  isError,
+}) => {
   return (
     <div className="game-stats-card">
       <div className="stats-header">
@@ -9,20 +15,16 @@ const GameStats = ({ timeElapsed, CPM, numCharactersTyped, percentComplete, isEr
       </div>
       <div className="stats-main">
         <div className="stats-column">
-          <div className="stats-label">CPM</div>
-          <div className="stats-value">{CPM}</div>
+          <div className="stats-label">WPM</div>
+          <div className="stats-value">{WPM}</div>
         </div>
         <div className="vertical-divider"></div>
         <div className="stats-column">
-          <div className="stats-label">Characters</div>
-          <div className="stats-value">{numCharactersTyped}</div>
+          <div className="stats-label">Words</div>
+          <div className="stats-value">{numWordsTyped}</div>
         </div>
       </div>
       <div className="stats-progress">
-        <div className="stats-column">
-          <div className="stats-label">Accuracy</div>
-          <div className="stats-value">{percentComplete}%</div>
-        </div>
         <div className="progress-container">
           <div className="stats-label">Progress</div>
           <div className="progress-bar-bg">
@@ -32,8 +34,10 @@ const GameStats = ({ timeElapsed, CPM, numCharactersTyped, percentComplete, isEr
             ></div>
           </div>
         </div>
+        <div className="stats-column">
+          {isError && <div className="error-message">Error detected!</div>}
+        </div>
       </div>
-      {isError && <div className="error-message">Error detected!</div>}
     </div>
   );
 };

@@ -22,15 +22,17 @@ function Game() {
   const [isError, setIsError] = useState(false);
   const [timeElapsed, setTimeElapsed] = useState(0);
 
-  // Player stats
+  // Player stats - modified to track words instead of characters
   const [accuracy, setAccuracy] = useState(0);
   const [percentComplete, setPercentComplete] = useState(0);
-  const [numCharactersTyped, setNumCharactersTyped] = useState(0);
-  const [CPM, setCPM] = useState(0);
+  const [numWordsTyped, setNumWordsTyped] = useState(0);
+  const [WPM, setWPM] = useState(0);
 
   const startTimeRef = useRef(null);
   const intervalRef = useRef(null);
   const typingInputRef = useRef(null);
+  // Create a ref to track the current words typed count
+  const wordsTypedRef = useRef(0);
 
   //----------------------------------------------------------------------------
   async function fetchUser() {
@@ -94,7 +96,8 @@ function Game() {
     }
     if (gameData.winner) {
       setWinnerDisplay(gameData);
-      updatePlayerProfile(gameData, user, numCharactersTyped);
+      console.log("wpm", WPM);
+      updatePlayerProfile(gameData, user, wordsTypedRef.current, WPM);
     }
   }
 
@@ -153,7 +156,10 @@ function Game() {
       }))
     );
   }
+
   useEffect(() => {
+    if (!gameId) return;
+
     fetchPlayers(gameId);
     const subscription = supabase
       .channel("game_players")
@@ -167,7 +173,8 @@ function Game() {
         },
         (payload) => {
           console.log("Game players subscription triggered:", payload);
-          fetchPlayers(gameId, setPlayers);
+
+          fetchPlayers(gameId);
         }
       )
       .subscribe();
@@ -193,15 +200,23 @@ function Game() {
     }
     console.log(`Player status updated to ${percentComplete}%`);
   }
+
   useEffect(() => {
     updatePlayerStatus();
   }, [percentComplete]);
 
   //----------------------------------------------------------------------------
 
-  //
+  // Helper function to count words in a string
+  const countWords = (text) => {
+    // Trim the text and split by whitespace
+    return text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
+  };
 
-  //
+  // Get total words in prompt
+  const getTotalPromptWords = () => {
+    return prompt ? countWords(prompt) : 0;
+  };
 
   //----------------------------------------------------------------------------
   function handleTypingInput(event) {
@@ -214,11 +229,14 @@ function Game() {
 
     const newResponse = event.target.value;
     setResponse(newResponse);
-    setNumCharactersTyped(newResponse.length);
+
+    const wordCount = countWords(newResponse);
+    setNumWordsTyped(wordCount);
+    wordsTypedRef.current = wordCount;
 
     updateIsError(newResponse);
     updateAccuracy(newResponse.length);
-    updateCPM();
+    updateWPM();
     updatePercentComplete(newResponse);
     console.log("\n");
   }
@@ -226,10 +244,11 @@ function Game() {
   const updateTimer = () => {
     const elapsed = (new Date() - startTimeRef.current) / 1000;
     setTimeElapsed(elapsed.toFixed(0));
-    updateCPM();
+    updateWPM();
   };
 
   const updateIsError = (newResponse) => {
+    if (!prompt) return;
     const error = !prompt.startsWith(newResponse);
     setIsError(error);
     if (error && newResponse.length > 0) {
@@ -242,21 +261,21 @@ function Game() {
     setAccuracy(accuracyValue);
   };
 
-  const updateCPM = () => {
+  const updateWPM = () => {
     const minutesElapsed = (new Date() - startTimeRef.current) / 1000 / 60;
-    const newCPM =
-      minutesElapsed > 0 ? (numCharactersTyped / minutesElapsed).toFixed(2) : 0;
-    setCPM(newCPM);
+    const newWPM =
+      minutesElapsed > 0
+        ? (wordsTypedRef.current / minutesElapsed).toFixed(2)
+        : 0;
+    setWPM(newWPM);
   };
 
   const updatePercentComplete = (newResponse) => {
-    if (!isError) {
+    if (!isError && prompt) {
       const completion = ((newResponse.length / prompt.length) * 100).toFixed(
         2
       );
       setPercentComplete(completion);
-
-      // Check if typing is complete (100%) and stop the timer
       if (parseFloat(completion) >= 100) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
@@ -264,9 +283,7 @@ function Game() {
     }
   };
 
-  //
-
-  //
+  //----------------------------------------------------------------------------
 
   function setWinnerDisplay(gameData) {
     const gameStatsCard = document.querySelector(".game-stats-card");
@@ -358,8 +375,8 @@ function Game() {
         <div className="secondary-container">
           <GameStats
             timeElapsed={timeElapsed}
-            CPM={CPM}
-            numCharactersTyped={numCharactersTyped}
+            WPM={WPM}
+            numWordsTyped={wordsTypedRef.current}
             percentComplete={percentComplete}
             isError={isError}
           />

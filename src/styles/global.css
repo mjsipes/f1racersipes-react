@@ -274,7 +274,6 @@ input:not([type="range"]) {
   border-radius: 4px;
 
 }
-
 /* stat card styles */
 .game-stats-card {
   border: 2px solid #e74c3c;
@@ -283,7 +282,6 @@ input:not([type="range"]) {
   padding: 12px;
   margin: 20px auto;
   border-radius: 4px;
-
 }
 
 .stats-header {
@@ -301,7 +299,7 @@ input:not([type="range"]) {
 }
 
 .timer-badge {
-  background-color: #e74c3c;;
+  background-color: #e74c3c;
   color: white;
   padding: 3px 8px;
   border-radius: 12px;
@@ -364,9 +362,8 @@ input:not([type="range"]) {
 }
 
 .error-message {
-  margin-top: 8px;
   color: #ff3333;
-  font-size: 12px;
+  font-size: 16px;
   font-weight: bold;
 }
 

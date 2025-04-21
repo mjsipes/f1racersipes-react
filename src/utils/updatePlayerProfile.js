@@ -1,6 +1,6 @@
 import supabase from "../supabaseClient";
 
-async function updatePlayerProfile(gameData, user, numCharactersTyped) {
+async function updatePlayerProfile(gameData, user, numWordsTyped, WPM) {
   if (!user) return;
   let isWinner;
   if (gameData.winner == user.id) {
@@ -8,7 +8,8 @@ async function updatePlayerProfile(gameData, user, numCharactersTyped) {
   } else {
     isWinner = false;
   }
-  const wordsTyped = Math.floor(numCharactersTyped / 5);
+
+  const roundedWPM = Math.floor(parseFloat(WPM));
 
   const { data: profileData, error: profileError } = await supabase
     .from("profiles")
@@ -27,7 +28,11 @@ async function updatePlayerProfile(gameData, user, numCharactersTyped) {
       gamesWon: isWinner
         ? (profileData.gamesWon || 0) + 1
         : profileData.gamesWon || 0,
-      total_words_typed: (profileData.total_words_typed || 0) + wordsTyped,
+      total_words_typed: (profileData.total_words_typed || 0) + numWordsTyped,
+      best_wpm:
+        !profileData.best_wpm || roundedWPM > profileData.best_wpm
+          ? roundedWPM
+          : profileData.best_wpm,
     })
     .eq("id", user.id);
   if (updateError) {
