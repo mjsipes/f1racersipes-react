@@ -1,4 +1,4 @@
-## F1 Racer Sipes
+## F1 Racer Sipes 🏎️
 
 **Live App: https://www.f1racersipes.com/**
 
