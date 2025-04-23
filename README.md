@@ -32,8 +32,6 @@ What started as a JavaServlets project has grown into a modern web application a
 ### What's Next
 
 I plan to continue using this project as my sandbox for learning new technologies. Future plans include:
-- Adding a dedicated waiting room with a countdown timer
-- Building a side chatroom for players to interact before and after races
 - Implementing AI bots that you can race against
 - Creating more advanced GUI elements for a better player experience
 
