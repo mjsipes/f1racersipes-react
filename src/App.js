@@ -8,6 +8,7 @@ import Pregaming from "./pages/pregaming";
 import StartGame from "./pages/startgame";
 import JoinGame from "./pages/joingame";
 import Game from "./pages/game";
+import { Analytics } from "@vercel/analytics/react";
 function App() {
   return (
     <div className="App">
@@ -20,6 +21,7 @@ function App() {
         <Route path="/joingame" element={<JoinGame />} />
         <Route path="/game/*" element={<Game />} />
       </Routes>
+      <Analytics />
     </div>
   );
 }
