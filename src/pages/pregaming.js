@@ -6,10 +6,12 @@ import Header from "../components/Header";
 function Pregaming() {
   const [user, setUser] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   async function fetchUser() {
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError) {
+      setLoading(false);
       console.log("authError: ", authError);
       alert(authError);
     }
@@ -28,6 +30,7 @@ function Pregaming() {
       alert(profileError);
     }
     setUserProfile(profile);
+    setLoading(false);
     console.log("profile: ", profile);
   }
 
@@ -58,16 +61,22 @@ function Pregaming() {
             )}
           </h2>
         </header>
-        {userProfile && (
-          <section className="player-stats">
+
+        {/* Stats section with fixed height to prevent layout shift */}
+        <section className="player-stats">
+          {loading ? (
+            <p>Loading stats...</p>
+          ) : userProfile ? (
             <p>
               <span>{userProfile.games_played}</span> games played.{" "}
               <span>{userProfile.gamesWon}</span> games won.{" "}
               <span>{userProfile.total_words_typed}</span> total words typed.{" "}
               <span>{userProfile.best_wpm}</span> WPM highscore.
             </p>
-          </section>
-        )}
+          ) : (
+            <p>No stats available</p>
+          )}
+        </section>
 
         <img
           src="/Racetrack.png"
