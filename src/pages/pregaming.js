@@ -2,16 +2,20 @@ import React from "react";
 import { useState, useEffect } from "react";
 import supabase from "../supabaseClient";
 import Header from "../components/Header";
+import CountUp from "react-countup";
 
 function Pregaming() {
   const [user, setUser] = useState(null);
-  const [userProfile, setUserProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [userProfile, setUserProfile] = useState({
+    games_played: 0,
+    gamesWon: 0,
+    total_words_typed: 0,
+    best_wpm: 0,
+  });
 
   async function fetchUser() {
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError) {
-      setLoading(false);
       console.log("authError: ", authError);
       alert(authError);
     }
@@ -30,7 +34,6 @@ function Pregaming() {
       alert(profileError);
     }
     setUserProfile(profile);
-    setLoading(false);
     console.log("profile: ", profile);
   }
 
@@ -64,18 +67,24 @@ function Pregaming() {
 
         {/* Stats section with fixed height to prevent layout shift */}
         <section className="player-stats">
-          {loading ? (
-            <p>Loading stats...</p>
-          ) : userProfile ? (
-            <p>
-              <span>{userProfile.games_played}</span> games played.{" "}
-              <span>{userProfile.gamesWon}</span> games won.{" "}
-              <span>{userProfile.total_words_typed}</span> total words typed.{" "}
-              <span>{userProfile.best_wpm}</span> WPM highscore.
-            </p>
-          ) : (
-            <p>No stats available</p>
-          )}
+          <p>
+            <span className="stat-number">
+              <CountUp end={userProfile.games_played} />
+            </span>{" "}
+            games played.{" "}
+            <span className="stat-number">
+              <CountUp end={userProfile.gamesWon} />
+            </span>{" "}
+            games won.{" "}
+            <span className="stat-number stat-number-large">
+              <CountUp end={userProfile.total_words_typed} />
+            </span>{" "}
+            total words typed.{" "}
+            <span className="stat-number">
+              <CountUp end={userProfile.best_wpm} />
+            </span>{" "}
+            WPM highscore.
+          </p>
         </section>
 
         <img

@@ -433,3 +433,13 @@ input:not([type="range"]) {
 .chat-send-button:hover {
   background-color: #c0392b;
 }
+
+.stat-number {
+  display: inline-block;
+  min-width: 30px;
+  text-align: right;
+}
+
+.stat-number-large {
+  min-width: 60px;
+}
